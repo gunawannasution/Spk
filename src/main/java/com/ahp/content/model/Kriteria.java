@@ -1,4 +1,5 @@
 package com.ahp.content.model;
+import com.ahp.content.dao.PdfExportable;
 import java.util.List;
 
 public class Kriteria implements PdfExportable {

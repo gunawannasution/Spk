@@ -3,6 +3,7 @@ package com.ahp.helper;
 import com.ahp.content.dao.PdfExportable;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import java.awt.Desktop;
 
 import java.io.*;
 import java.net.URL;
@@ -11,14 +12,26 @@ import java.util.Date;
 import java.util.List;
 
 public class ReportUtil {
-public static <T extends PdfExportable> void generatePdfReport(
-        List<T> dataList,
-        String[] headers,
-        String reportTitle,
-        String outputFilePath,
-        String kota,
-        String namaDirektur
+
+    public static <T extends PdfExportable> void generatePdfReport(
+            List<T> dataList,
+            String[] headers,
+            String reportTitle,
+            String baseFileName,
+            String kota,
+            String namaDirektur
     ) throws Exception {
+
+        // Siapkan folder laporan
+        File reportsDir = new File("reports");
+        if (!reportsDir.exists()) {
+            reportsDir.mkdirs();
+        }
+
+        // Penamaan file otomatis
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String outputFilePath = "reports/" + baseFileName.replaceAll("\\s+", "_").toLowerCase() + "_" + timestamp + ".pdf";
+
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, new FileOutputStream(outputFilePath));
         document.open();
@@ -35,7 +48,6 @@ public static <T extends PdfExportable> void generatePdfReport(
         PdfPTable table = new PdfPTable(headers.length);
         table.setWidthPercentage(100);
 
-        // Jika ingin set lebar kolom bisa sesuaikan di sini, contoh all sama rata:
         float[] columnWidths = new float[headers.length];
         for (int i = 0; i < headers.length; i++) {
             columnWidths[i] = 1f;
@@ -44,20 +56,30 @@ public static <T extends PdfExportable> void generatePdfReport(
 
         addTableHeader(table, headers);
 
+        int no = 1;
         for (T item : dataList) {
             List<String> row = item.toPdfRow();
-            for (String cellValue : row) {
-                table.addCell(cellValue);
+
+            // Tambahkan nomor urut jika kolom "No" digunakan
+            for (int i = 0; i < headers.length; i++) {
+                String value;
+                if (i == 0 && headers[0].equalsIgnoreCase("No")) {
+                    value = String.valueOf(no++);
+                } else {
+                    value = row.get(i - (headers[0].equalsIgnoreCase("No") ? 1 : 0));
+                }
+                PdfPCell cell = new PdfPCell(new Phrase(value));
+                cell.setPadding(5);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                table.addCell(cell);
             }
         }
 
         document.add(table);
 
         addFooter(document, kota, namaDirektur);
-
         document.close();
 
-        // pdf langsung terbuka
         openPdf(outputFilePath);
     }
 
@@ -111,7 +133,8 @@ public static <T extends PdfExportable> void generatePdfReport(
     }
 
     private static byte[] readImageBytes(URL imageUrl) throws Exception {
-        try (var is = imageUrl.openStream(); var baos = new java.io.ByteArrayOutputStream()) {
+        try (InputStream is = imageUrl.openStream();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[1024];
             int n;
             while ((n = is.read(buffer)) != -1) {
@@ -123,16 +146,25 @@ public static <T extends PdfExportable> void generatePdfReport(
 
     private static void openPdf(String filePath) {
         try {
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", filePath).start();
-            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                new ProcessBuilder("open", filePath).start();
-            } else { // linux and others
-                new ProcessBuilder("xdg-open", filePath).start();
+            File file = new File(filePath);
+            if (!file.exists()) {
+                System.err.println("File PDF tidak ditemukan: " + filePath);
+                return;
+            }
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    desktop.open(file);
+                    System.out.println("Membuka PDF dengan aplikasi default.");
+                } else {
+                    System.err.println("Action OPEN tidak didukung di Desktop.");
+                }
+            } else {
+                System.err.println("Desktop tidak didukung di sistem ini.");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Gagal membuka file PDF: " + e.getMessage());
         }
     }
 }
-

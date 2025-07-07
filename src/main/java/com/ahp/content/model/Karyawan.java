@@ -1,6 +1,9 @@
 package com.ahp.content.model;
 
-public class Karyawan {
+import com.ahp.content.dao.PdfExportable;
+import java.util.List;
+
+public class Karyawan implements PdfExportable {
     int id;
     String nik,nama,jabatan,alamat;
 
@@ -57,6 +60,16 @@ public class Karyawan {
      @Override
     public String toString() {
         return nama; // Menampilkan nama karyawan di combobox
+    }
+
+    @Override
+        public List<String> toPdfRow() {
+        return List.of(
+            nik != null ? nik : "",
+            nama != null ? nama : "",
+            jabatan != null ? jabatan : "",
+            alamat != null ? alamat : ""
+        );
     }
     
 }

@@ -237,5 +237,8 @@ public class KriteriaPanel extends JPanel {
             new Object[]{k.getId(), k.getKode(), k.getNama(), k.getKet(), k.getBobot()}
         );
     }
+        
+    
+        
 
 }

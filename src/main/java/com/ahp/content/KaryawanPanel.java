@@ -4,6 +4,7 @@ import com.ahp.content.dao.KaryawanDAO;
 import com.ahp.content.dao.KaryawanDAOImpl;
 import com.ahp.content.model.Karyawan;
 import com.ahp.helper.BuatTable;
+import com.ahp.helper.ReportUtil;
 import com.ahp.helper.UIComponent;
 import com.ahp.helper.libButton;
 import com.ahp.helper.SearchBox;
@@ -18,7 +19,7 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 
 public class KaryawanPanel extends JPanel {
 
-    private final JButton btnTambah;
+    private final JButton btnTambah, btnCetak;
     private BuatTable<Karyawan> tablePanel;
     private final KaryawanDAO dao = new KaryawanDAOImpl(); 
 
@@ -27,8 +28,10 @@ public class KaryawanPanel extends JPanel {
          
         btnTambah = new btnModern("Tambah");
         btnTambah.addActionListener(e -> inputData(null));
-
         btnTambah.setBackground(Color.decode("#4CAF50")); 
+        btnCetak=new btnModern("Print");
+        btnCetak.addActionListener(e->printReport());
+      
         
         SearchBox search = new SearchBox("Cari data...", keyword -> filterPencarian(keyword));
         search.setMaximumSize(new Dimension(250, 36));  
@@ -40,6 +43,7 @@ public class KaryawanPanel extends JPanel {
          
         atasPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); 
         atasPanel.add(btnTambah);
+        atasPanel.add(btnCetak);
         atasPanel.add(Box.createRigidArea(new Dimension(20, 0))); 
         atasPanel.add(Box.createHorizontalGlue());               
         atasPanel.add(search);
@@ -219,7 +223,7 @@ public class KaryawanPanel extends JPanel {
         return null;
     }
     
-        private void filterPencarian(String keyword) {
+    private void filterPencarian(String keyword) {
         String lower = keyword.toLowerCase();
         List<Karyawan> filtered = dao.getAll().stream()
             .filter(k -> k.getNik().toLowerCase().contains(lower)
@@ -230,5 +234,33 @@ public class KaryawanPanel extends JPanel {
             new Object[]{k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()}
         );
     }
+    
+    private void printReport() {
+        try {
+            List<Karyawan> list = dao.getAll();
+            if (list.isEmpty()) {
+                showInfo("Tidak ada data karyawan untuk dicetak.");
+                return;
+            }
 
+            ReportUtil.generatePdfReport(
+                list,
+                new String[]{"No","NIK", "Nama", "Jabatan", "Alamat"},
+                "Laporan Data Karyawan",
+                "laporan_karyawan",
+                "Jakarta",
+                "GUNAWAN"
+            );
+            showInfo("Laporan berhasil dibuat.");
+        } catch (Exception e) {
+            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+        }
+    }
+    private void showInfo(String msg) {
+    JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
+}
+
+    private void showError(String msg, String title) {
+        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+    }
 }
