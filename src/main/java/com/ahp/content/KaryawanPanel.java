@@ -257,8 +257,8 @@ public class KaryawanPanel extends JPanel {
         }
     }
     private void showInfo(String msg) {
-    JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-}
+        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     private void showError(String msg, String title) {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
