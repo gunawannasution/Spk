@@ -6,17 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DashboardPanel extends JPanel {
-
     public DashboardPanel() {
         setBackground(UIComponent.BACKGROUND_COLOR);
         setLayout(new BorderLayout(20, 20));
 
-        // Header with title and quick actions
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
-        // Quick action buttons
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actionPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         
@@ -26,16 +23,13 @@ public class DashboardPanel extends JPanel {
         actionPanel.add(btnNewAssessment);
         actionPanel.add(btnViewReport);
 
-       // headerPanel.add(title, BorderLayout.WEST);
         headerPanel.add(actionPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Main content - AHP Dashboard Cards
         JPanel cardsPanel = new JPanel();
         cardsPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         cardsPanel.setLayout(new GridLayout(1, 4, 20, 0));
 
-        // AHP-specific cards
         cardsPanel.add(summaryCard("Total Karyawan", "42", UIComponent.PRIMARY_COLOR, "orang"));
         cardsPanel.add(summaryCard("Kriteria Penilaian", "5", UIComponent.SECONDARY_COLOR, "kriteria"));
         cardsPanel.add(summaryCard("Penilaian Aktif", "3", UIComponent.PRIMARY_COLOR, "proses"));
@@ -47,7 +41,6 @@ public class DashboardPanel extends JPanel {
         centerWrapper.add(cardsPanel);
         add(centerWrapper, BorderLayout.CENTER);
 
-        // Recent activities section
         JPanel activityPanel = new JPanel(new BorderLayout());
         activityPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         activityPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
@@ -106,8 +99,8 @@ public class DashboardPanel extends JPanel {
 
         card.add(valuePanel, BorderLayout.CENTER);
         card.add(lblTitle, BorderLayout.SOUTH);
-
-        // Hover effect
+        
+        //hover untuk button
         card.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -124,7 +117,6 @@ public class DashboardPanel extends JPanel {
                 ));
             }
         });
-
         return card;
     }
 }

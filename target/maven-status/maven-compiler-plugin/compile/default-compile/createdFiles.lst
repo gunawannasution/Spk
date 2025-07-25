@@ -12,7 +12,6 @@ com\ahp\content\LaporanPanel.class
 com\ahp\helper\BuatTable.class
 com\ahp\helper\btnModern$1.class
 com\ahp\template\FooterPanel.class
-com\ahp\template\TataLetak.class
 com\ahp\content\PenilaianPanel$7.class
 com\ahp\template\SidebarPanel$1.class
 com\ahp\content\KaryawanPanel$3.class

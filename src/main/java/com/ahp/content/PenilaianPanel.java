@@ -46,12 +46,6 @@ public class PenilaianPanel extends JPanel {
     private JButton btnSimpan, btnHapus, btnHitungSkor;
 
     public PenilaianPanel() {
-        initUI();
-        initListeners();
-        loadData();
-    }
-
-    private void initUI() {
         setLayout(new BorderLayout());
         setBackground(BACKGROUND_COLOR);
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -67,7 +61,12 @@ public class PenilaianPanel extends JPanel {
         mainPanel.add(createResultsPanel(), BorderLayout.SOUTH);
         
         add(mainPanel, BorderLayout.CENTER);
+        
+        initListeners();
+        loadData();
     }
+
+    
     private void initListeners() {
         this.addAncestorListener(new AncestorListener() {
             @Override
@@ -80,16 +79,15 @@ public class PenilaianPanel extends JPanel {
             public void ancestorMoved(AncestorEvent event) {}
         });
 
-        // Tambahkan ActionListener untuk tombol-tombol
         btnSimpan.addActionListener(e -> save());
         btnHapus.addActionListener(e -> delete());
         btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
     }
+    
     private JPanel createInputPanel() {
         allKriteria = kriteriaDAO.getAll();
         int kolom = allKriteria.size();
 
-        // Gunakan ukuran kolom yang sama untuk semua field
         StringBuilder colConstraints = new StringBuilder("[]10");
         for (int i = 0; i < kolom; i++) {
             colConstraints.append("[150::,fill]"); // Set fixed minimum width of 150px for each criteria column
@@ -105,7 +103,6 @@ public class PenilaianPanel extends JPanel {
             new Font("Segoe UI", Font.BOLD, 12),
             new Color(80, 80, 80)));
 
-        // ComboBox Alternatif
         cbAlternatif = new JComboBox<>();
         cbAlternatif.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -134,9 +131,8 @@ public class PenilaianPanel extends JPanel {
             panel.add(lbl, "cell " + (i + 1) + " 1, center");
         }
 
-        // Input field untuk nilai tiap kriteria dengan ukuran yang sama
         kriteriaFields.clear();
-        Dimension fieldSize = new Dimension(150, 30); // Ukuran tetap untuk semua textfield
+        Dimension fieldSize = new Dimension(150, 30); 
         for (int i = 0; i < kolom; i++) {
             JTextField tf = new JTextField();
             tf.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -151,7 +147,7 @@ public class PenilaianPanel extends JPanel {
             kriteriaFields.add(tf);
         }
 
-        // Tombol-tombol
+        
         btnSimpan = createStyledButton("Simpan", PRIMARY_COLOR);
         btnHapus = createStyledButton("Hapus", SECONDARY_COLOR);
         btnHitungSkor = createStyledButton("Hitung Skor", new Color(76, 175, 80));
@@ -386,11 +382,12 @@ public class PenilaianPanel extends JPanel {
                 return alternatifDAO.getAll();
             }
 
+            @Override
             protected void done() {
                 try {
                     cbAlternatif.removeAllItems();
                     for (Karyawan a : get()) cbAlternatif.addItem(a);
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     JOptionPane.showMessageDialog(PenilaianPanel.this,
                             "Gagal memuat alternatif: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }

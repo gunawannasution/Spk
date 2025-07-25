@@ -3,11 +3,11 @@ package com.ahp.content;
 import com.ahp.helper.UIComponent;
 import com.ahp.helper.libButton;
 import com.ahp.helper.PerhitunganAHP;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.Locale;
+import javax.swing.border.EmptyBorder;
 
 public class MatrixPanel extends JPanel {
     private final int n = 4;
@@ -25,50 +25,54 @@ public class MatrixPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(UIComponent.BACKGROUND_COLOR);
 
-        // Panel input matrix perbandingan
+        // ===== 1. JUDUL =====
+        JLabel lblJudul = new JLabel("Analisis AHP - Data Karyawan");
+        lblJudul.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblJudul.setForeground(new Color(33, 33, 33));
+        lblJudul.setBorder(new EmptyBorder(15, 15, 10, 15));
+        add(lblJudul, BorderLayout.NORTH);  // Tambahkan di atas panel
+        
+        // ===== 2. PANEL UTAMA =====
         JPanel inputPanel = buatMatrixPanel("MATRIX PERBANDINGAN BERPASANGAN", true);
-
-        // Panel normalisasi
         JPanel normPanel = buatMatrixPanel("MATRIX NORMALISASI", false);
-
-        // Panel prioritas + CI + CR
         JPanel hasilPanel = buatPanelHasil();
 
-        // Tombol hitung & simpan
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(UIComponent.BACKGROUND_COLOR);
+        mainPanel.setBorder(new EmptyBorder(10, 15, 10, 15));  // Padding isi
+
+        mainPanel.add(inputPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(normPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(hasilPanel);
+
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Scroll halus
+        add(scrollPane, BorderLayout.CENTER);
+
+        // ===== 3. TOMBOL =====
         btnHitung = libButton.buatBtn(libButton.ButtonType.HITUNG);
         btnSimpan = libButton.buatBtn(libButton.ButtonType.SIMPAN);
         btnSimpan.setEnabled(false);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBackground(UIComponent.BACKGROUND_COLOR);
+        btnPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
         btnPanel.add(btnHitung);
         btnPanel.add(btnSimpan);
-
-        // Gabungkan semua panel utama
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.add(inputPanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(normPanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(hasilPanel);
-        mainPanel.setBackground(UIComponent.BACKGROUND_COLOR);
-
-        // Tambahkan scroll untuk responsif saat layar kecil
-        JScrollPane scrollPane = new JScrollPane(mainPanel);
-        scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
 
+        // ===== 4. Aksi & Setup =====
         isiDiagonal();
+        pasangListenerReciprocal();
 
-        // Pasang listener tombol hitung dan simpan
         btnHitung.addActionListener(e -> hitungAHP());
         btnSimpan.addActionListener(e -> simpanHasil());
-
-        // Pasang listener reciprocal supaya otomatis update nilai kebalikan
-        pasangListenerReciprocal();
     }
+
     private JPanel buatMatrixPanel(String title, boolean editable) {
         JPanel panel = new JPanel(new GridLayout(n + 1, n + 1, 5, 5));
         panel.setBackground(UIComponent.BACKGROUND_COLOR);

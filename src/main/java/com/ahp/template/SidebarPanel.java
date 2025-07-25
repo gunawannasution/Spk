@@ -25,17 +25,16 @@ public class SidebarPanel extends JPanel {
         setBackground(COLOR_BG);
         setPreferredSize(new Dimension(220, Integer.MAX_VALUE));
 
-        // Tambahkan menu dengan ikon (pastikan ikon ada di /resources/icons/)
-        add(Box.createVerticalStrut(20)); // spasi atas
+        add(Box.createVerticalStrut(20)); 
         addMenuItem("Dashboard", "dashboard", "/icons/dashboard.png");
         addMenuItem("Karyawan", "karyawan", "/icons/karyawan.png");
         addMenuItem("Kriteria", "kriteria", "/icons/kriteria.png");
         addMenuItem("Matrix", "matrix", "/icons/matrix.png");
-        addMenuItem("Penilaian", "penilaian", "/icons/matrix.png");
+        addMenuItem("Penilaian", "penilaian", "/icons/penilaian.png");
         addMenuItem("Laporan", "laporan", "/icons/laporan.png");
         addMenuItem("Pengaturan", "pengaturan", "/icons/pengaturan.png");
 
-        add(Box.createVerticalGlue()); // push item ke atas
+        add(Box.createVerticalGlue());
     }
 
     private void addMenuItem(String label, String actionCommand, String iconPath) {

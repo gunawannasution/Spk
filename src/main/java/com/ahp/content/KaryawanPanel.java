@@ -25,33 +25,61 @@ public class KaryawanPanel extends JPanel {
 
     public KaryawanPanel() {
         setLayout(new BorderLayout());
-         
+        setBackground(UIComponent.BACKGROUND_COLOR);
+
+        //Buat judul
+        JLabel lblJudul = new JLabel("Data Karyawan");
+        lblJudul.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblJudul.setForeground(new Color(33, 33, 33));
+        lblJudul.setBorder(new EmptyBorder(10, 15, 5, 15));
+
+        // buat button
         btnTambah = new btnModern("Tambah");
+        ImageIcon iconTambah = new ImageIcon(getClass().getResource("/icons/tambah.png"));
+        Image scaledImage = iconTambah.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+        // Pastikan path dan nama file benar
+        btnTambah.setIcon(new ImageIcon(scaledImage));
         btnTambah.addActionListener(e -> inputData(null));
-        btnTambah.setBackground(Color.decode("#4CAF50")); 
-        btnCetak=new btnModern("Print");
-        btnCetak.addActionListener(e->printReport());
-      
-        
+        //btnTambah.setBackground(Color.decode("#4CAF50")); 
+
+        btnCetak = new btnModern("Print");
+        btnCetak.addActionListener(e -> printReport());
+
         SearchBox search = new SearchBox("Cari data...", keyword -> filterPencarian(keyword));
-        search.setMaximumSize(new Dimension(250, 36));  
+        search.setMaximumSize(new Dimension(250, 36));
         search.setPreferredSize(new Dimension(250, 36));
+        
+        //panel tempat button dan search
+        JPanel panelBtnSearch = new JPanel();
+        panelBtnSearch.setLayout(new BoxLayout(panelBtnSearch, BoxLayout.X_AXIS));
+        panelBtnSearch.setBackground(UIComponent.BACKGROUND_COLOR);
+        panelBtnSearch.setBorder(new EmptyBorder(10, 10, 10, 10));
+        panelBtnSearch.add(btnTambah);
+        panelBtnSearch.add(Box.createRigidArea(new Dimension(10, 0)));
+        panelBtnSearch.add(btnCetak);
+        panelBtnSearch.add(Box.createHorizontalGlue());
+        panelBtnSearch.add(search);
 
-        JPanel atasPanel = new JPanel();
-        atasPanel.setLayout(new BoxLayout(atasPanel, BoxLayout.X_AXIS));
-        atasPanel.setBackground(UIComponent.BACKGROUND_COLOR);
-         
-        atasPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); 
-        atasPanel.add(btnTambah);
-        atasPanel.add(btnCetak);
-        atasPanel.add(Box.createRigidArea(new Dimension(20, 0))); 
-        atasPanel.add(Box.createHorizontalGlue());               
-        atasPanel.add(search);
+        // === 3. Gabungkan judul + atasPanel ===
+        JPanel panelHeader = new JPanel(new BorderLayout());
+        panelHeader.setBackground(UIComponent.BACKGROUND_COLOR);
+        panelHeader.add(lblJudul, BorderLayout.NORTH);
+        panelHeader.add(panelBtnSearch, BorderLayout.CENTER);
 
-        add(atasPanel, BorderLayout.NORTH);
+        // === 4. Panel Utama (berisi semua isi lainnya) ===
+        JPanel panelUtama = new JPanel(new BorderLayout());
+        panelUtama.setBackground(UIComponent.BACKGROUND_COLOR);
+        panelUtama.add(panelHeader, BorderLayout.NORTH);
 
-        tableKaryawan();
-        tidakKlikTable();
+        // Panggil tableKaryawan tapi tambahkan ke panelUtama
+        tableKaryawan(); // inisialisasi tablePanel
+        panelUtama.add(tablePanel, BorderLayout.CENTER);
+
+        // Tambahkan panelUtama ke this
+        add(panelUtama, BorderLayout.CENTER);
+
+        
+       tidakKlikTable();
 
     }
     
@@ -193,11 +221,13 @@ public class KaryawanPanel extends JPanel {
                 if (evt.getClickCount() == 2 && row != -1) {
                     // Double klik baris tabel yang valid
                     Karyawan k = tablePanel.getRowData(row);
-                    btnTambah.setText("Update Karyawan");
+                    btnTambah.setText("Update");
+                    btnTambah.setEnabled(false);
                     inputData(k);
                 } else if (evt.getClickCount() == 1 && row == -1) {
                     // Klik satu kali di area kosong tabel
-                    btnTambah.setText("Tambah Karyawan");
+                    btnTambah.setText("Tambah");
+                    btnTambah.setEnabled(true);
                 }
             }
         });
@@ -217,7 +247,8 @@ public class KaryawanPanel extends JPanel {
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnTambah.setText("Tambah Karyawan");
+                btnTambah.setText("Tambah");
+                btnTambah.setEnabled(true);
             }
         });
         return null;

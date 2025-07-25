@@ -15,23 +15,15 @@ public class ContentPanel extends JPanel {
     private final JPanel cardPanel = new JPanel(cardLayout);
 
     public ContentPanel() {
-        initComponents();
-        setupPanels();
-    }
-
-    private void initComponents() {
         setLayout(new BorderLayout());
-        putClientProperty(FlatClientProperties.STYLE, 
-            "background: $Panel.background");
+        putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
         
-        cardPanel.putClientProperty(FlatClientProperties.STYLE, 
-            "background: $Panel.background");
-        
+        cardPanel.putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
         add(cardPanel, BorderLayout.CENTER);
+        buatPanel();
     }
 
-    private void setupPanels() {
-        // Tambahkan semua halaman dengan animasi fade
+    private void buatPanel() {
         addPanelWithFade(new DashboardPanel(), "dashboard");
         addPanelWithFade(new KaryawanPanel(), "karyawan");
         addPanelWithFade(new KriteriaPanel(), "kriteria");
@@ -40,13 +32,11 @@ public class ContentPanel extends JPanel {
     }
 
     private void addPanelWithFade(JPanel panel, String name) {
-        panel.putClientProperty(FlatClientProperties.STYLE, 
-            "background: $Panel.background");
+        panel.putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
         cardPanel.add(panel, name);
     }
 
     public void showPanel(String name) {
-        // Animasi transisi halus
         try {
             cardLayout.show(cardPanel, name);
             cardPanel.revalidate();
@@ -56,7 +46,6 @@ public class ContentPanel extends JPanel {
         }
     }
 
-    // Metode tambahan untuk navigasi yang lebih baik
     public void navigateTo(String panelName) {
         if (cardPanel.getComponentCount() > 0) {
             showPanel(panelName);

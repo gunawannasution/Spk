@@ -26,7 +26,12 @@ public class KriteriaPanel extends JPanel {
 
     public KriteriaPanel() {
         setLayout(new BorderLayout());         
-
+        
+        JLabel lblJudul = new JLabel("Data Kriteria Penilaian");
+        lblJudul.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblJudul.setForeground(new Color(33, 33, 33)); // Warna gelap
+        lblJudul.setBorder(new EmptyBorder(10, 15, 5, 15));
+        
         btnTambah = new btnModern("Tambah");
         btnTambah.addActionListener(e -> inputData(null));  
         btnTambah.setBackground(Color.decode("#4CAF50")); 
@@ -43,12 +48,19 @@ public class KriteriaPanel extends JPanel {
          
         atasPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); 
         atasPanel.add(btnTambah);
+         atasPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         atasPanel.add(btnCetak);
         atasPanel.add(Box.createRigidArea(new Dimension(20, 0))); 
         atasPanel.add(Box.createHorizontalGlue());               
         atasPanel.add(search);
 
-        add(atasPanel, BorderLayout.NORTH);
+        JPanel panelAtasGabungan = new JPanel();
+        panelAtasGabungan.setLayout(new BorderLayout());
+        panelAtasGabungan.setBackground(UIComponent.BACKGROUND_COLOR);
+        panelAtasGabungan.add(lblJudul, BorderLayout.NORTH);
+        panelAtasGabungan.add(atasPanel, BorderLayout.CENTER);
+
+        add(panelAtasGabungan, BorderLayout.NORTH);
 
         tableKriteria();
         tidakKlikTable();
