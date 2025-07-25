@@ -14,7 +14,6 @@ com\ahp\helper\btnModern$1.class
 com\ahp\template\FooterPanel.class
 com\ahp\content\PenilaianPanel$7.class
 com\ahp\template\SidebarPanel$1.class
-com\ahp\content\KaryawanPanel$3.class
 com\ahp\helper\BuatTable$1.class
 com\ahp\helper\UIComponent$1.class
 com\ahp\template\SidebarPanel.class
@@ -24,7 +23,6 @@ com\ahp\content\model\Kriteria.class
 com\ahp\content\dao\MatrixAlternatifDAO.class
 com\ahp\content\PenilaianPanel$2.class
 com\ahp\helper\UIComponent.class
-com\ahp\content\KriteriaPanel$3.class
 com\ahp\content\model\MatrixAlternatif.class
 com\ahp\helper\BuatMatrix.class
 com\ahp\helper\BuatTable$3.class

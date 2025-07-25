@@ -32,11 +32,27 @@ public class KriteriaPanel extends JPanel {
         lblJudul.setForeground(new Color(33, 33, 33)); // Warna gelap
         lblJudul.setBorder(new EmptyBorder(10, 15, 5, 15));
         
-        btnTambah = new btnModern("Tambah");
-        btnTambah.addActionListener(e -> inputData(null));  
-        btnTambah.setBackground(Color.decode("#4CAF50")); 
-        btnCetak=new btnModern("Print");
+        btnTambah = new btnModern("Tambah",new Color(76, 175, 80));
+        ImageIcon iconTambah = new ImageIcon(getClass().getResource("/icons/tambah.png"));
+        Image scaledImage = iconTambah.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        btnTambah.setIcon(new ImageIcon(scaledImage));
+        btnTambah.addActionListener(e -> inputData(null));
+        btnTambah.setHorizontalAlignment(SwingConstants.LEFT);        
+        btnTambah.setHorizontalTextPosition(SwingConstants.RIGHT);     
+        btnTambah.setIconTextGap(6);   
+        btnTambah.addActionListener(e -> inputData(null)); 
+        
+        btnCetak=new btnModern("Print",new Color(96, 125, 139));
+        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
+        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
+        btnCetak.addActionListener(e -> printReport());
+        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
+        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
+        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btnCetak.setIconTextGap(6);
         btnCetak.addActionListener(e->printReport());
+        
         
         SearchBox search = new SearchBox("Cari data...", keyword -> filterPencarian(keyword));
         search.setMaximumSize(new Dimension(250, 36));  
@@ -48,7 +64,7 @@ public class KriteriaPanel extends JPanel {
          
         atasPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); 
         atasPanel.add(btnTambah);
-         atasPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        atasPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         atasPanel.add(btnCetak);
         atasPanel.add(Box.createRigidArea(new Dimension(20, 0))); 
         atasPanel.add(Box.createHorizontalGlue());               
@@ -96,22 +112,12 @@ public class KriteriaPanel extends JPanel {
             txtBobot.setText(String.valueOf(k.getBobot()));
         }
 
-        JButton btnSimpan = libButton.buatBtn(isEdit ? libButton.ButtonType.UPDATE : libButton.ButtonType.SIMPAN);
-        btnSimpan.setBackground(new Color(38, 166, 154));  
+        btnModern btnSimpan = new btnModern(isEdit ? "Update" : "Simpan", new Color(38, 166, 154)); // hijau teal
+
         btnSimpan.setForeground(Color.WHITE);
         btnSimpan.setFocusPainted(false);
         btnSimpan.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
         btnSimpan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnSimpan.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnSimpan.setBackground(new Color(26, 128, 120));
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnSimpan.setBackground(new Color(38, 166, 154));
-            }
-        });
 
         btnSimpan.addActionListener(e -> {
             String kode = txtKode.getText().trim();
