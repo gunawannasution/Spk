@@ -12,6 +12,10 @@ import com.ahp.content.model.HasilAlternatif;
 import com.ahp.content.model.Karyawan;
 import com.ahp.content.model.Kriteria;
 import com.ahp.content.model.MatrixAlternatif;
+import com.ahp.content.model.MatrixAlternatifPrint;
+import com.ahp.helper.MatrixAlternatifConverter;
+import com.ahp.helper.ReportUtil;
+import com.ahp.helper.btnModern;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -37,7 +41,6 @@ public class PenilaianPanel extends JPanel {
     private final MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl();
     private final KaryawanDAO alternatifDAO = new KaryawanDAOImpl();
     private final KriteriaDAO kriteriaDAO = new KriteriaDAOImpl();
-
     private JTable table, tableHasil;
     private DefaultTableModel model, modelHasil;
     private JComboBox<Karyawan> cbAlternatif;
@@ -151,12 +154,22 @@ public class PenilaianPanel extends JPanel {
         btnSimpan = createStyledButton("Simpan", PRIMARY_COLOR);
         btnHapus = createStyledButton("Hapus", SECONDARY_COLOR);
         btnHitungSkor = createStyledButton("Hitung Skor", new Color(76, 175, 80));
-
+        
+        btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
+        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
+        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
+        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
+        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btnCetak.setIconTextGap(6);
+        btnCetak.addActionListener(e -> printReport());
+        
         JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         bp.setBackground(Color.WHITE);
         bp.add(btnSimpan);
         bp.add(btnHapus);
         bp.add(btnHitungSkor);
+        bp.add(btnCetak);
 
         panel.add(bp, "cell 0 3, span " + (kolom + 1) + ", growx");
 
@@ -669,4 +682,49 @@ private void delete() {
             }
         }
     }
+    
+    private void printReport() {
+    try {
+        List<MatrixAlternatif> dataMentah = matrixDAO.getAll();
+        if (dataMentah.isEmpty()) {
+            showInfo("Tidak ada data untuk dicetak.");
+            return;
+        }
+
+        int jumlahKriteria = 4;
+
+        // Map idAlternatif ke namaAlternatif, pastikan ini sudah benar
+        Map<Integer, String> alternatifMap = alternatifDAO.getAllAlternatifAsMap();
+
+        // Nama kriteria sesuai urutan ID kriteria: 1->Kompetensi, 2->Disiplin, dll
+        List<String> namaKriteriaList = Arrays.asList("Kompetensi", "Disiplin", "Tanggung Jawab", "Kerjasama");
+
+        // Konversi data mentah ke data siap cetak
+        List<MatrixAlternatifPrint> dataPrint = MatrixAlternatifConverter.groupByAlternatif(dataMentah, jumlahKriteria, alternatifMap);
+
+        // Buat header sesuai kebutuhan
+        String[] headers = MatrixAlternatifConverter.buatHeaders(jumlahKriteria, namaKriteriaList);
+
+        ReportUtil.generatePdfReport(
+            dataPrint,
+            headers,
+            "Laporan Matriks Alternatif",
+            "laporan_matrix_alternatif",
+            "Jakarta, 26 July 2025",
+            "Direktur"
+        );
+
+        showInfo("Laporan Matrix Alternatif berhasil dicetak.");
+    } catch (Exception e) {
+        showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+    }
+}
+
+    private void showInfo(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void showError(String msg, String title) {
+        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+    }
+
 }

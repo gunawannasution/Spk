@@ -1,6 +1,7 @@
 package com.ahp.template;
 
 import com.ahp.helper.UIComponent;
+import com.ahp.helper.btnModern;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -28,8 +29,8 @@ public class HeaderPanel extends JPanel {
         panelKanan.setOpaque(false);
         add(panelKanan, BorderLayout.EAST);
 
-        // Contoh tombol logout
-        JButton btnLogout = new JButton("Logout");
+        
+        btnModern btnLogout = new btnModern("Logout",new Color(255,0,0));
         btnLogout.setFocusPainted(false);
         btnLogout.setForeground(Color.WHITE);
         btnLogout.setBackground(new Color(220, 53, 69));

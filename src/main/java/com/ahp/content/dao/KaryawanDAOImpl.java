@@ -3,7 +3,9 @@ import com.ahp.content.model.Karyawan;
 import com.ahp.util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 public class KaryawanDAOImpl implements KaryawanDAO {
@@ -147,5 +149,22 @@ public class KaryawanDAOImpl implements KaryawanDAO {
             Logger.getLogger(KaryawanDAOImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return null;  
+    }
+
+    @Override
+    public Map<Integer, String> getAllAlternatifAsMap() {
+        Map<Integer, String> map = new HashMap<>();
+        String sql = "SELECT id, nama FROM alternatif";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                map.put(rs.getInt("id"), rs.getString("nama"));
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(KaryawanDAOImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return map;
+
     }
 }

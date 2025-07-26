@@ -271,7 +271,7 @@ public class KriteriaPanel extends JPanel {
 
             ReportUtil.generatePdfReport(
                 list,
-                new String[]{"No","KODE", "NAMA KRITERIA", "KETERANGAN", "BOBOT"},
+                new String[]{"No","Kode", "NAMA KRITERIA", "KETERANGAN", "BOBOT"},
                 "Data Kriteria Penilaian",
                 "laporan_kriteria",
                 "Jakarta",
@@ -285,7 +285,6 @@ public class KriteriaPanel extends JPanel {
     private void showInfo(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
     }
-
     private void showError(String msg, String title) {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }

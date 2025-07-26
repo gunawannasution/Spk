@@ -13,6 +13,9 @@ import com.formdev.flatlaf.FlatClientProperties;
 public class ContentPanel extends JPanel {
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cardPanel = new JPanel(cardLayout);
+    
+    // Simpan referensi MatrixPanel agar tidak null saat dipanggil
+    private MatrixPanel matrixPanel;
 
     public ContentPanel() {
         setLayout(new BorderLayout());
@@ -27,7 +30,11 @@ public class ContentPanel extends JPanel {
         addPanelWithFade(new DashboardPanel(), "dashboard");
         addPanelWithFade(new KaryawanPanel(), "karyawan");
         addPanelWithFade(new KriteriaPanel(), "kriteria");
-        addPanelWithFade(new MatrixPanel(), "matrix");
+
+        // Inisialisasi dan simpan instance MatrixPanel
+        matrixPanel = new MatrixPanel();
+        addPanelWithFade(matrixPanel, "matrix");
+
         addPanelWithFade(new PenilaianPanel(), "penilaian");
     }
 
@@ -59,5 +66,10 @@ public class ContentPanel extends JPanel {
             }
         }
         return null;
+    }
+
+    // Getter matrixPanel yang sudah diinisialisasi
+    public MatrixPanel getMatrixPanel() {
+        return matrixPanel;
     }
 }

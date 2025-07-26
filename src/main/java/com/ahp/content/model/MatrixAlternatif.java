@@ -46,4 +46,5 @@ public class MatrixAlternatif {
     public void setNilai(double nilai) {
         this.nilai = nilai;
     }
+    
 }

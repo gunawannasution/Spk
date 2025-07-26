@@ -1,10 +1,18 @@
 package com.ahp.content;
 
+import com.ahp.content.dao.KriteriaDAO;
+import com.ahp.content.dao.KriteriaDAOImpl;
+import com.ahp.content.dao.MatrixDAO;
+import com.ahp.content.dao.MatrixDAOImpl;
+import com.ahp.content.model.Kriteria;
+import com.ahp.content.model.Matrix;
 import com.ahp.helper.UIComponent;
-import com.ahp.helper.libButton;
 import com.ahp.helper.PerhitunganAHP;
+import com.ahp.helper.ReportUtil;
+import com.ahp.helper.btnModern;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import java.util.List;
 import java.awt.*;
 import java.util.Locale;
 import javax.swing.border.EmptyBorder;
@@ -17,22 +25,22 @@ public class MatrixPanel extends JPanel {
     private final JTextField[] priorityFields = new JTextField[n];
     private final JTextField ciField = new JTextField();
     private final JTextField crField = new JTextField();
-    private final JButton btnHitung;
-    private final JButton btnSimpan;
+    private final btnModern btnSimpan;
+    private final boolean[][] isUpdating = new boolean[n][n];
     private double[] hasilPrioritas;
+
+    private final MatrixDAO dao = new MatrixDAOImpl(); 
 
     public MatrixPanel() {
         setLayout(new BorderLayout());
         setBackground(UIComponent.BACKGROUND_COLOR);
 
-        // ===== 1. JUDUL =====
-        JLabel lblJudul = new JLabel("Analisis AHP - Data Karyawan");
+        JLabel lblJudul = new JLabel("Matrix Perhitungan - Analisis AHP ");
         lblJudul.setFont(new Font("SansSerif", Font.BOLD, 20));
         lblJudul.setForeground(new Color(33, 33, 33));
         lblJudul.setBorder(new EmptyBorder(15, 15, 10, 15));
-        add(lblJudul, BorderLayout.NORTH);  // Tambahkan di atas panel
+        add(lblJudul, BorderLayout.NORTH);  
         
-        // ===== 2. PANEL UTAMA =====
         JPanel inputPanel = buatMatrixPanel("MATRIX PERBANDINGAN BERPASANGAN", true);
         JPanel normPanel = buatMatrixPanel("MATRIX NORMALISASI", false);
         JPanel hasilPanel = buatPanelHasil();
@@ -40,7 +48,7 @@ public class MatrixPanel extends JPanel {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(UIComponent.BACKGROUND_COLOR);
-        mainPanel.setBorder(new EmptyBorder(10, 15, 10, 15));  // Padding isi
+        mainPanel.setBorder(new EmptyBorder(10, 15, 10, 15));  
 
         mainPanel.add(inputPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -50,27 +58,41 @@ public class MatrixPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Scroll halus
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); 
         add(scrollPane, BorderLayout.CENTER);
 
-        // ===== 3. TOMBOL =====
-        btnHitung = libButton.buatBtn(libButton.ButtonType.HITUNG);
-        btnSimpan = libButton.buatBtn(libButton.ButtonType.SIMPAN);
+        btnModern btnHitung = new btnModern("Hitung", new Color(255,0,0));
+        btnSimpan = new btnModern("Simpan",new Color(0,128,255));
         btnSimpan.setEnabled(false);
 
+        btnModern btnClear = new btnModern("Clear", new Color(128, 128, 128));
+
+        btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
+        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
+        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
+        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
+        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btnCetak.setIconTextGap(6);
+        btnCetak.addActionListener(e->printReport());
+        
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         btnPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
         btnPanel.add(btnHitung);
         btnPanel.add(btnSimpan);
+        btnPanel.add(btnClear);
+        btnPanel.add(btnCetak);
         add(btnPanel, BorderLayout.SOUTH);
-
-        // ===== 4. Aksi & Setup =====
-        isiDiagonal();
-        pasangListenerReciprocal();
 
         btnHitung.addActionListener(e -> hitungAHP());
         btnSimpan.addActionListener(e -> simpanHasil());
+        btnClear.addActionListener(e -> kosongkanForm());
+        btnCetak.addActionListener(e -> printReport());
+        
+        tampilkanNormalisasiDariDB();
+        isiDiagonal();
+        pasangListenerReciprocal();
     }
 
     private JPanel buatMatrixPanel(String title, boolean editable) {
@@ -182,43 +204,65 @@ public class MatrixPanel extends JPanel {
                 if (i != j) {
                     final int row = i;
                     final int col = j;
+
                     inputFields[row][col].getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-                        boolean updating = false;
+
                         private void updateReciprocal() {
-                            if (updating) return;
-                            updating = true;
+                            if (isUpdating[row][col]) return;
+
                             try {
                                 String text = inputFields[row][col].getText().trim();
                                 if (text.isEmpty()) {
+                                    isUpdating[col][row] = true;
                                     inputFields[col][row].setText("");
+                                    isUpdating[col][row] = false;
                                     return;
                                 }
 
                                 double val = parseInput(text);
                                 if (val <= 0) {
+                                    isUpdating[col][row] = true;
                                     inputFields[col][row].setText("");
+                                    isUpdating[col][row] = false;
                                     return;
                                 }
+
                                 double reciprocal = 1.0 / val;
-                                inputFields[col][row].setText(formatDouble(reciprocal));
+                                String reciprocalText = formatDouble(reciprocal);
+
+                                if (!inputFields[col][row].getText().equals(reciprocalText)) {
+                                    isUpdating[col][row] = true;
+                                    inputFields[col][row].setText(reciprocalText);
+                                    isUpdating[col][row] = false;
+                                }
+
                             } catch (NumberFormatException ignored) {
+                                isUpdating[col][row] = true;
                                 inputFields[col][row].setText("");
-                            } finally {
-                                updating = false;
+                                isUpdating[col][row] = false;
                             }
                         }
 
                         @Override
-                        public void insertUpdate(javax.swing.event.DocumentEvent e) { updateReciprocal(); }
+                        public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                            updateReciprocal();
+                        }
+
                         @Override
-                        public void removeUpdate(javax.swing.event.DocumentEvent e) { updateReciprocal(); }
+                        public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                            updateReciprocal();
+                        }
+
                         @Override
-                        public void changedUpdate(javax.swing.event.DocumentEvent e) { updateReciprocal(); }
+                        public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                            updateReciprocal();
+                        }
                     });
                 }
             }
         }
     }
+
     private double parseInput(String text) throws NumberFormatException {
         // Terima format 1/3 atau angka biasa
         text = text.replace(",", ".");
@@ -294,7 +338,7 @@ public class MatrixPanel extends JPanel {
             // Tampilkan CI dan CR
             ciField.setText(formatDouble(ci));
             crField.setText(formatDouble(cr));
-
+            
             btnSimpan.setEnabled(true);
 
             if (cr > 0.1) {
@@ -310,9 +354,143 @@ public class MatrixPanel extends JPanel {
         }
     }
     private void simpanHasil() {
-        // Placeholder simpan, bisa ditambah sesuai kebutuhan
-        JOptionPane.showMessageDialog(this,
-                "Hasil berhasil disimpan (placeholder).",
-                "Info", JOptionPane.INFORMATION_MESSAGE);
+        if (hasilPrioritas == null || hasilPrioritas.length != kriteria.length) {
+            JOptionPane.showMessageDialog(this,
+                    "Belum ada hasil AHP yang dapat disimpan.",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            KriteriaDAO kriteriaDAO = new KriteriaDAOImpl(); // ganti dengan cara instansiasi sesuai project kamu
+            List<Kriteria> existingKriteria = kriteriaDAO.getAll(); // ambil semua kriteria dari DB
+
+            if (existingKriteria.size() != hasilPrioritas.length) {
+                JOptionPane.showMessageDialog(this,
+                        "Jumlah kriteria di database tidak sesuai hasil AHP.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Update bobot di objek kriteria
+            for (int i = 0; i < existingKriteria.size(); i++) {
+                existingKriteria.get(i).setBobot(hasilPrioritas[i]);
+            }
+
+            boolean berhasil = kriteriaDAO.updateAllBobot(existingKriteria);
+
+            if (berhasil) {
+                JOptionPane.showMessageDialog(this,
+                        "Bobot berhasil diperbarui di database.",
+                        "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Gagal menyimpan bobot ke database.",
+                        "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Terjadi kesalahan saat menyimpan:\n" + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
+    
+    private void tampilkanNormalisasiDariDB() {
+        try {
+            // Ganti dengan DAO sesuai struktur project kamu
+            MatrixDAO normalisasiDAO = new MatrixDAOImpl();
+
+            List<String> kriteriaList = java.util.Arrays.asList(kriteria); // array to list
+            double[][] normMatrix = normalisasiDAO.ambilMatrixNormalisasi(kriteriaList);
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    normFields[i][j].setText(formatDouble(normMatrix[i][j]));
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Gagal menampilkan matrix normalisasi dari database:\n" + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
+    private void kosongkanForm() {
+        // Kosongkan input fields
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    inputFields[i][j].setText("");
+                    inputFields[i][j].setBackground(Color.WHITE);
+                }
+                normFields[i][j].setText("");
+            }
+        }
+
+        // Reset diagonal tetap 1
+        isiDiagonal();
+
+        // Kosongkan hasil prioritas, CI, CR
+        for (int i = 0; i < n; i++) {
+            priorityFields[i].setText("");
+        }
+        ciField.setText("");
+        crField.setText("");
+
+        // Nonaktifkan tombol simpan
+        btnSimpan.setEnabled(false);
+
+        // Hapus hasil prioritas yang tersimpan
+        hasilPrioritas = null;
+    }
+    public void muatDataNormalisasiDariDatabase() {
+        try {
+            MatrixDAO dao = new MatrixDAOImpl();
+            List<String> kriteriaList = java.util.Arrays.asList(kriteria);
+            double[][] dataNormalisasi = dao.ambilMatrixNormalisasi(kriteriaList);
+
+            for (int i = 0; i < dataNormalisasi.length; i++) {
+                for (int j = 0; j < dataNormalisasi[i].length; j++) {
+                    normFields[i][j].setText(String.format(Locale.US, "%.4f", dataNormalisasi[i][j]));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Gagal memuat data normalisasi dari database:\n" + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    private void printReport() {
+        try {
+            List<Matrix> list = dao.getAll();
+            if (list.isEmpty()) {
+                showInfo("Tidak ada data karyawan untuk dicetak.");
+                return;
+            }
+
+            ReportUtil.generatePdfReport(
+                list,
+                new String[]{"No", "Kriteria Baris", "Kriteria Kolom", "Nilai"},
+                "Data Kriteria Penilaian",
+                "laporan_kriteria",
+                "Jakarta",
+                "GUNAWAN"
+            );
+            showInfo("Laporan berhasil dibuat.");
+        } catch (Exception e) {
+            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+        }
+    }
+    private void showInfo(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void showError(String msg, String title) {
+        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+    }
+        
 }

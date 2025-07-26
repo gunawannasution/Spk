@@ -17,6 +17,7 @@ com\ahp\template\SidebarPanel$1.class
 com\ahp\helper\BuatTable$1.class
 com\ahp\helper\UIComponent$1.class
 com\ahp\template\SidebarPanel.class
+com\ahp\helper\MatrixAlternatifConverter.class
 com\ahp\helper\libButton.class
 com\ahp\content\dao\KaryawanDAO.class
 com\ahp\content\model\Kriteria.class
@@ -66,4 +67,5 @@ com\ahp\helper\ReportUtil.class
 com\ahp\content\dao\MatrixAlternatifDAOImpl.class
 com\ahp\helper\FormHelper.class
 com\ahp\template\HeaderPanel.class
+com\ahp\content\model\MatrixAlternatifPrint.class
 com\ahp\template\ContentPanel.class

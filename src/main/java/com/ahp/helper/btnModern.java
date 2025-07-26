@@ -13,7 +13,7 @@ public class btnModern extends JButton {
     private int arc = 14;
 
     public btnModern(String text) {
-        this(text, UIComponent.PRIMARY_COLOR);  // default ke warna utama
+        this(text, UIComponent.PRIMARY_COLOR);  
     }
 
     public btnModern(String text, Color color) {
@@ -30,14 +30,19 @@ public class btnModern extends JButton {
         setFocusPainted(false);
         setBorder(new EmptyBorder(8, 14, 8, 14));
         setForeground(textColor);
-        setFont(new Font("Segoe UI", Font.BOLD, 12));
+        setFont(new Font("Segoe UI", Font.BOLD, 14));
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        setPreferredSize(new Dimension(110, 36));
-        setHorizontalAlignment(SwingConstants.LEFT);             
-        setHorizontalTextPosition(SwingConstants.RIGHT);         
-        setIconTextGap(8);                                      
-        super.setBackground(baseColor);                          
+        //setPreferredSize(new Dimension(110, 36));
+
+        // agar teks dan ikon berada di tengah
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setHorizontalTextPosition(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setVerticalTextPosition(SwingConstants.CENTER);
+
+        super.setBackground(baseColor);
     }
+
 
     private void initMouseEffects() {
         addMouseListener(new MouseAdapter() {
@@ -83,7 +88,7 @@ public class btnModern extends JButton {
     // Menghindari pengubahan baseColor saat dipanggil dari luar
     @Override
     public void setBackground(Color bg) {
-        super.setBackground(bg);  // hanya pengaruh ke visual
+        super.setBackground(bg); 
     }
 
     public void setTextColor(Color color) {

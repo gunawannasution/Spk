@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class MainFrame extends JFrame{
+public class MainFrame extends JFrame {
     private final ContentPanel contentPanel;
 
     public MainFrame() {
@@ -24,11 +24,14 @@ public class MainFrame extends JFrame{
         // Buat komponen
         SidebarPanel sidebar = new SidebarPanel(); 
         contentPanel = new ContentPanel();        
+
+        // Tambahkan listener ke tombol-tombol menu
         for (Component comp : sidebar.getComponents()) {
             if (comp instanceof JButton btn) {
                 btn.addActionListener(getMenuActionListener());
             }
         }
+
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
         add(new HeaderPanel(), BorderLayout.NORTH);
@@ -48,8 +51,10 @@ public class MainFrame extends JFrame{
                 case "kriteria":
                     contentPanel.showPanel("kriteria");
                     break;
-                    
                 case "matrix":
+                    // Muat ulang data normalisasi saat Matrix dibuka
+                    contentPanel.getMatrixPanel().muatDataNormalisasiDariDatabase();
+
                     contentPanel.showPanel("matrix");
                     break;
                 case "penilaian":

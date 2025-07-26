@@ -67,6 +67,6 @@ public class Kriteria implements PdfExportable {
     
     @Override
     public List<String> toPdfRow() {
-        return List.of(String.valueOf(id),kode,nama,ket,String.valueOf(bobot));
+        return List.of(kode,nama,ket,String.format("%.4f", bobot));
     }
 }

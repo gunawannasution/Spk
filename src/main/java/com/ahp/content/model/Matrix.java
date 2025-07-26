@@ -1,6 +1,9 @@
 package com.ahp.content.model;
 
-public class Matrix {
+import com.ahp.content.dao.PdfExportable;
+import java.util.List;
+
+public class Matrix implements PdfExportable{
     private int id; // auto-increment
     private String kriteriaRow;
     private String kriteriaCol;
@@ -49,5 +52,14 @@ public class Matrix {
 
     public void setNilai(double nilai) {
         this.nilai = nilai;
+    }
+    @Override
+    public List<String> toPdfRow() {
+        return List.of(
+//            String.valueOf(id),
+            kriteriaRow,
+            kriteriaCol,
+            String.format("%.4f", nilai) // ✅ Format 4 angka di belakang koma
+        );
     }
 }
