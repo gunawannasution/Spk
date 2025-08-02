@@ -1,6 +1,9 @@
 package com.ahp.content.model;
 
-public class HasilAlternatif {
+import com.ahp.content.dao.PdfExportable;
+import java.util.List;
+
+public class HasilAlternatif implements PdfExportable {
     
     private int id;
     private int idAlternatif;
@@ -21,5 +24,15 @@ public class HasilAlternatif {
     public double getSkor() { return skor; }
     public int getPeringkat() { return peringkat; }
     public String getRekomendasi() { return rekomendasi; }
+    
+    @Override
+    public List<String> toPdfRow() {
+    return List.of(
+        String.valueOf(idAlternatif),
+        String.valueOf(peringkat),
+        String.format("%.4f", skor),
+        String.valueOf(rekomendasi)
+    );
+}
 
 }

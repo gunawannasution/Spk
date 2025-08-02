@@ -64,11 +64,9 @@ public class KaryawanPanel extends JPanel {
 
         add(panelHeader, BorderLayout.NORTH);
 
-        // Buat tabel dan tambahkan di CENTER
         tableKaryawan();
         add(tablePanel, BorderLayout.CENTER);
 
-        // Reset tombol saat klik area kosong
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {

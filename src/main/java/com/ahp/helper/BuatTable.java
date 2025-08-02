@@ -166,4 +166,6 @@ public class BuatTable<T> extends JPanel {
             model.addRow(mapper.apply(obj));
         }
     }
+    
+   
 }

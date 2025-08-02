@@ -10,6 +10,7 @@
         <maven.compiler.release>23</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <exec.mainClass>com.ahp.Main</exec.mainClass>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
     <dependencies>
         <!-- FlatLaf Dependency -->

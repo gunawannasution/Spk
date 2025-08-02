@@ -31,7 +31,7 @@ public class LaporanPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        // Header judul panel
+        // Header judul
         JLabel header = new JLabel("Laporan");
         header.setFont(UIComponent.FONT_BOLD.deriveFont(24f));
         header.setForeground(UIComponent.PRIMARY_COLOR);
@@ -47,33 +47,33 @@ public class LaporanPanel extends JPanel {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // Tombol baris 1
+        // Baris 1
         gbc.gridy = 1;
         gbc.gridx = 0;
         add(createButton("Cetak Matriks Alternatif", "/icons/print.png", () -> {
-            if (penilaianPanel != null) {
-                penilaianPanel.printReport();
-            } else {
-                JOptionPane.showMessageDialog(this, "PenilaianPanel belum tersedia!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            if (penilaianPanel != null) penilaianPanel.printReport();
+            else JOptionPane.showMessageDialog(this, "PenilaianPanel belum tersedia!", "Error", JOptionPane.ERROR_MESSAGE);
         }), gbc);
 
         gbc.gridx = 1;
         add(createButton("Cetak Karyawan", "/icons/print.png", () -> karyawanPanel.printReport()), gbc);
 
-        // Tombol baris 2
+        // Baris 2
         gbc.gridy = 2;
         gbc.gridx = 0;
         add(createButton("Cetak Matrix Alternatif", "/icons/print.png", () -> matrixPanel.printReport()), gbc);
 
         gbc.gridx = 1;
         add(createButton("Cetak Kriteria", "/icons/print.png", () -> kriteriaPanel.printReport()), gbc);
+        
+        gbc.gridx = 3;
+        add(createButton("Cetak Hasil AHP", "/icons/print.png", () -> penilaianPanel.printReportHasil()), gbc);
     }
 
     private JButton createButton(String title, String iconPath, Runnable action) {
         JButton button = new JButton(title, new ImageIcon(getClass().getResource(iconPath)));
         button.setFont(UIComponent.FONT_BOLD.deriveFont(14f));
-        button.setPreferredSize(new Dimension(260, 45));
+        button.setPreferredSize(new Dimension(100, 80));
         button.setForeground(Color.WHITE);
         button.setBackground(UIComponent.PRIMARY_COLOR);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -84,14 +84,12 @@ public class LaporanPanel extends JPanel {
         button.setOpaque(true);
         button.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
 
-        // Hover effect: warna background jadi sedikit lebih gelap
+        // Hover effect warna lebih gelap
         button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
+            @Override public void mouseEntered(MouseEvent e) {
                 button.setBackground(UIComponent.PRIMARY_COLOR.darker());
             }
-            @Override
-            public void mouseExited(MouseEvent e) {
+            @Override public void mouseExited(MouseEvent e) {
                 button.setBackground(UIComponent.PRIMARY_COLOR);
             }
         });

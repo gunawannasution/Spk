@@ -13,7 +13,9 @@ import com.ahp.content.model.Karyawan;
 import com.ahp.content.model.Kriteria;
 import com.ahp.content.model.MatrixAlternatif;
 import com.ahp.content.model.MatrixAlternatifPrint;
+import com.ahp.helper.BuatTable;
 import com.ahp.helper.ReportUtil;
+import com.ahp.helper.UIComponent;
 import com.ahp.helper.btnModern;
 import net.miginfocom.swing.MigLayout;
 
@@ -29,7 +31,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 public class PenilaianPanel extends JPanel {
-    // Warna modern
     private static final Color PRIMARY_COLOR = new Color(63, 81, 181);
     private static final Color SECONDARY_COLOR = new Color(233, 30, 99);
     private static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
@@ -38,9 +39,9 @@ public class PenilaianPanel extends JPanel {
     
     private final HasilAlternatifDAO hasilDAO = new HasilAlternatifDAOImpl();
     private final MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl();
-    
     private final KaryawanDAO alternatifDAO = new KaryawanDAOImpl();
     private final KriteriaDAO kriteriaDAO = new KriteriaDAOImpl();
+    
     private JTable table, tableHasil;
     private DefaultTableModel model, modelHasil;
     private JComboBox<Karyawan> cbAlternatif;
@@ -59,22 +60,20 @@ public class PenilaianPanel extends JPanel {
                 new MatteBorder(1, 1, 1, 1, new Color(220, 220, 220)),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
 
-        mainPanel.add(createInputPanel(), BorderLayout.NORTH);
-        mainPanel.add(createTablePanel(), BorderLayout.CENTER);
-        mainPanel.add(createResultsPanel(), BorderLayout.SOUTH);
+        mainPanel.add(panelInput(), BorderLayout.NORTH);
+        mainPanel.add(panelTabel(), BorderLayout.CENTER);
+        mainPanel.add(panelHasil(), BorderLayout.SOUTH);
         
         add(mainPanel, BorderLayout.CENTER);
         
         initListeners();
         loadData();
-    }
-
-    
+    }    
     private void initListeners() {
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                refreshAlternatifCombo();
+                refreshIsiCombobox();
             }
             @Override
             public void ancestorRemoved(AncestorEvent event) {}
@@ -85,15 +84,14 @@ public class PenilaianPanel extends JPanel {
         btnSimpan.addActionListener(e -> save());
         btnHapus.addActionListener(e -> delete());
         btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
-    }
-    
-    private JPanel createInputPanel() {
+    }  
+    private JPanel panelInput() {
         allKriteria = kriteriaDAO.getAll();
         int kolom = allKriteria.size();
 
         StringBuilder colConstraints = new StringBuilder("[]10");
         for (int i = 0; i < kolom; i++) {
-            colConstraints.append("[150::,fill]"); // Set fixed minimum width of 150px for each criteria column
+            colConstraints.append("[150::,fill]"); 
         }
 
         JPanel panel = new JPanel(new MigLayout("wrap " + (kolom + 1), colConstraints.toString(), "[]10[]10[]10[]"));
@@ -151,9 +149,9 @@ public class PenilaianPanel extends JPanel {
         }
 
         
-        btnSimpan = createStyledButton("Simpan", PRIMARY_COLOR);
-        btnHapus = createStyledButton("Hapus", SECONDARY_COLOR);
-        btnHitungSkor = createStyledButton("Hitung Skor", new Color(76, 175, 80));
+        btnSimpan = new btnModern("Simpan", new Color(0,128,255));
+        btnHapus = new btnModern("Hapus", new Color(255,0,0));
+        btnHitungSkor = new btnModern("Hitung Skor", new Color(76, 175, 80));
         
         btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
         ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
@@ -175,31 +173,7 @@ public class PenilaianPanel extends JPanel {
 
         return panel;
     }
-    private JButton createStyledButton(String text, Color bgColor) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        button.setBackground(bgColor);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(bgColor.darker(), 1, true),
-            BorderFactory.createEmptyBorder(8, 20, 8, 20)
-        ));
-        
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor.darker());
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor);
-            }
-        });
-        
-        return button;
-    }
-    private JPanel createTablePanel() {
+    private JPanel panelTabel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
@@ -221,8 +195,8 @@ public class PenilaianPanel extends JPanel {
         };
 
         table = new JTable(model);
-        customizeTable(table);
-        table.getSelectionModel().addListSelectionListener(e -> fillFormFromTable());
+        customTable(table);
+        table.getSelectionModel().addListSelectionListener(e -> isiFormDariTable());
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width, 250));
@@ -230,7 +204,7 @@ public class PenilaianPanel extends JPanel {
         panel.add(scrollPane, BorderLayout.CENTER);
         return panel;
     }
-    private JPanel createResultsPanel() {
+    private JPanel panelHasil() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
@@ -332,63 +306,18 @@ public class PenilaianPanel extends JPanel {
         panel.add(scrollPane, BorderLayout.CENTER);
         return panel;
     }
-    private void customizeTable(JTable table) {
-        table.setRowHeight(30);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setFillsViewportHeight(true);
-        table.setAutoCreateRowSorter(true);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(5, 5)); // Diperkecil dari 100,100
-        table.setSelectionBackground(new Color(220, 220, 255));
-        table.setSelectionForeground(Color.BLACK);
-
-        // Styling header tabel
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(TABLE_HEADER_COLOR);
-        header.setForeground(TABLE_HEADER_TEXT_COLOR);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        // Renderer untuk isi tabel
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                // Set warna teks default
-                c.setForeground(Color.BLACK); // Pastikan teks berwarna gelap
-                c.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-                // Warna background
-                if (!isSelected) {
-                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 248, 248));
-                }
-
-                // Alignment tengah
-                ((JLabel)c).setHorizontalAlignment(SwingConstants.CENTER);
-
-                return c;
-            }
-        };
-
-        // Terapkan ke semua kolom
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-    }
     private void loadData() {
         SwingWorker<Void, Void> w = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-                refreshAlternatifCombo();
+                refreshIsiCombobox();
                 loadTable();
                 return null;
             }
         };
         w.execute();
     }
-    public void refreshAlternatifCombo() {
+    public void refreshIsiCombobox() {
         SwingWorker<List<Karyawan>, Void> w = new SwingWorker<>() {
             @Override
             protected List<Karyawan> doInBackground() {
@@ -446,13 +375,13 @@ public class PenilaianPanel extends JPanel {
         };
         w.execute();
     }
-    private void fillFormFromTable() {
+    private void isiFormDariTable() {
         int sel = table.getSelectedRow();
         if (sel == -1) return;
 
         int id = (Integer) model.getValueAt(sel, 0);
         String name = (String) model.getValueAt(sel, 1);
-        selectCombo(cbAlternatif, name, Karyawan::getNama);
+        pilihCombo(cbAlternatif, name, Karyawan::getNama);
 
         for (int i = 0; i < allKriteria.size(); i++) {
             Object v = model.getValueAt(sel, i + 2);
@@ -515,51 +444,50 @@ public class PenilaianPanel extends JPanel {
             "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+    private void delete() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, 
+                "Pilih data yang akan dihapus terlebih dahulu", 
+                "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-private void delete() {
-    int selectedRow = table.getSelectedRow();
-    if (selectedRow < 0) {
-        JOptionPane.showMessageDialog(this, 
-            "Pilih data yang akan dihapus terlebih dahulu", 
-            "Peringatan", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+        int idAlternatif = (Integer) model.getValueAt(selectedRow, 0);
+        String namaAlternatif = (String) model.getValueAt(selectedRow, 1);
 
-    int idAlternatif = (Integer) model.getValueAt(selectedRow, 0);
-    String namaAlternatif = (String) model.getValueAt(selectedRow, 1);
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Apakah Anda yakin ingin menghapus data untuk alternatif " + namaAlternatif + "?", 
+            "Konfirmasi", JOptionPane.YES_NO_OPTION);
 
-    int confirm = JOptionPane.showConfirmDialog(this, 
-        "Apakah Anda yakin ingin menghapus data untuk alternatif " + namaAlternatif + "?", 
-        "Konfirmasi", JOptionPane.YES_NO_OPTION);
-
-    if (confirm == JOptionPane.YES_OPTION) {
-        try {
-            boolean success = true;
-            for (Kriteria k : allKriteria) {
-                if (!matrixDAO.delete(idAlternatif, k.getId())) {
-                    success = false;
-                    break;
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                boolean success = true;
+                for (Kriteria k : allKriteria) {
+                    if (!matrixDAO.delete(idAlternatif, k.getId())) {
+                        success = false;
+                        break;
+                    }
                 }
-            }
 
-            if (success) {
+                if (success) {
+                    JOptionPane.showMessageDialog(this, 
+                        "Data berhasil dihapus", 
+                        "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    loadTable();
+                    clearForm();
+                } else {
+                    JOptionPane.showMessageDialog(this, 
+                        "Gagal menghapus beberapa data", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, 
-                    "Data berhasil dihapus", 
-                    "Sukses", JOptionPane.INFORMATION_MESSAGE);
-                loadTable();
-                clearForm();
-            } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Gagal menghapus beberapa data", 
+                    "Gagal menghapus data: " + ex.getMessage(), 
                     "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Gagal menghapus data: " + ex.getMessage(), 
-                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
     private void hitungSkorAlternatif() {
         btnHitungSkor.setEnabled(false); // Disable tombol selama proses
         btnHitungSkor.setText("Menghitung...");
@@ -674,15 +602,58 @@ private void delete() {
         kriteriaFields.forEach(tf -> tf.setText(""));
         table.clearSelection();
     }
-    private <T> void selectCombo(JComboBox<T> cb, String value, java.util.function.Function<T, String> getter) {
+    private <T> void pilihCombo(JComboBox<T> cb, String value, java.util.function.Function<T, String> getter) {
         for (int i = 0; i < cb.getItemCount(); i++) {
             if (getter.apply(cb.getItemAt(i)).equals(value)) {
                 cb.setSelectedIndex(i);
                 return;
             }
         }
+    }  
+    public void customTable(JTable table) {
+        table.setRowHeight(30);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setFillsViewportHeight(true);
+        table.setAutoCreateRowSorter(true);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(5, 5)); // Diperkecil dari 100,100
+        table.setSelectionBackground(new Color(220, 220, 255));
+        table.setSelectionForeground(Color.BLACK);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(63, 81, 181));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Segoe UI", Font.BOLD, 12));
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value,boolean isSelected, 
+                    boolean hasFocus, int row, int column) 
+            {
+
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                c.setForeground(Color.BLACK); // Pastikan teks berwarna gelap
+                c.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+                // Warna background
+                if (!isSelected) {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 248, 248));
+                }
+
+                // Alignment tengah
+                ((JLabel)c).setHorizontalAlignment(SwingConstants.CENTER);
+
+                return c;
+            }
+        };
+
+        // Terapkan ke semua kolom
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
     }
-    
     public void printReport() {
         List<Kriteria> listKriteria = kriteriaDAO.getAll();
         List<Karyawan> listAlternatif = alternatifDAO.getAll();
@@ -721,13 +692,31 @@ private void delete() {
             e.printStackTrace();
         }
     }
+    public void printReportHasil() {
+        try {
+            List<HasilAlternatif> list = hasilDAO.getAll();
+            if (list.isEmpty()) {
+                showInfo("Tidak ada data karyawan untuk dicetak.");
+                return;
+            }
 
-
+            ReportUtil.generatePdfReport(
+                list,
+                new String[]{"No", "NIK", "Nama", "Jabatan", "Alamat"},
+                "Laporan Data Karyawan",
+                "laporan_karyawan",
+                "Jakarta",
+                "GUNAWAN"
+            );
+            showInfo("Laporan berhasil dibuat.");
+        } catch (Exception e) {
+            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+        }
+    }
     private void showInfo(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
     }
     private void showError(String msg, String title) {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
-
 }

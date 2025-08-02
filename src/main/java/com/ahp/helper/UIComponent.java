@@ -204,4 +204,5 @@ public class UIComponent {
         button.setContentAreaFilled(true); // biar FlatLaf styling jalan dengan baik
         return button;
     }
+    
 }
