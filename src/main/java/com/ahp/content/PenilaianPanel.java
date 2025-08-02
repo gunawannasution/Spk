@@ -692,17 +692,9 @@ private void delete() {
         }
 
         int jumlahKriteria = 4;
-
-        // Map idAlternatif ke namaAlternatif, pastikan ini sudah benar
         Map<Integer, String> alternatifMap = alternatifDAO.getAllAlternatifAsMap();
-
-        // Nama kriteria sesuai urutan ID kriteria: 1->Kompetensi, 2->Disiplin, dll
         List<String> namaKriteriaList = Arrays.asList("Kompetensi", "Disiplin", "Tanggung Jawab", "Kerjasama");
-
-        // Konversi data mentah ke data siap cetak
         List<MatrixAlternatifPrint> dataPrint = MatrixAlternatifConverter.groupByAlternatif(dataMentah, jumlahKriteria, alternatifMap);
-
-        // Buat header sesuai kebutuhan
         String[] headers = MatrixAlternatifConverter.buatHeaders(jumlahKriteria, namaKriteriaList);
 
         ReportUtil.generatePdfReport(
@@ -710,7 +702,7 @@ private void delete() {
             headers,
             "Laporan Matriks Alternatif",
             "laporan_matrix_alternatif",
-            "Jakarta, 26 July 2025",
+            "Jakarta",
             "Direktur"
         );
 
