@@ -14,6 +14,7 @@ D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\DashboardPanel.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\KaryawanPanel.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\KriteriaPanel.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\LaporanPanel.java
+D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\LaporanPanel1.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\MatrixPanel.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\model\HasilAlternatif.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\content\model\Karyawan.java
@@ -28,7 +29,6 @@ D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\BuatMatrix.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\BuatTable.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\FormHelper.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\libButton.java
-D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\MatrixAlternatifConverter.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\PerhitunganAHP.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\ReportUtil.java
 D:\AHPFLATLAF\spk\src\main\java\com\ahp\helper\SearchBox.java

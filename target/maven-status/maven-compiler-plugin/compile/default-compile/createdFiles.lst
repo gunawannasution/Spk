@@ -25,6 +25,7 @@ com\ahp\helper\UIComponent$2.class
 com\ahp\helper\libButton$ButtonType.class
 com\ahp\content\model\Karyawan.class
 com\ahp\content\KaryawanPanel.class
+com\ahp\content\LaporanPanel1.class
 com\ahp\content\PenilaianPanel$12.class
 com\ahp\content\PenilaianPanel$4.class
 com\ahp\content\DashboardPanel$1.class
@@ -51,8 +52,8 @@ com\ahp\content\PenilaianPanel$7.class
 com\ahp\helper\BuatTable$1.class
 com\ahp\helper\UIComponent$1.class
 com\ahp\template\SidebarPanel.class
-com\ahp\helper\MatrixAlternatifConverter.class
 com\ahp\content\PenilaianPanel$2.class
+com\ahp\content\LaporanPanel$1.class
 com\ahp\helper\BuatTable$3.class
 com\ahp\content\controller\MatrixController.class
 com\ahp\MainFrame.class

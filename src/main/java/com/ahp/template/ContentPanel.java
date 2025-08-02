@@ -3,6 +3,7 @@ package com.ahp.template;
 import com.ahp.content.DashboardPanel;
 import com.ahp.content.KaryawanPanel;
 import com.ahp.content.KriteriaPanel;
+import com.ahp.content.LaporanPanel;
 import com.ahp.content.MatrixPanel;
 import com.ahp.content.PenilaianPanel;
 import java.awt.BorderLayout;
@@ -16,7 +17,10 @@ public class ContentPanel extends JPanel {
     
     // Simpan referensi MatrixPanel agar tidak null saat dipanggil
     private MatrixPanel matrixPanel;
-
+    private PenilaianPanel penilaianPanel = new PenilaianPanel();
+    private final KaryawanPanel karyawanPanel=new KaryawanPanel();
+    private KriteriaPanel kriteriaPanel=new KriteriaPanel();
+    
     public ContentPanel() {
         setLayout(new BorderLayout());
         putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
@@ -30,11 +34,12 @@ public class ContentPanel extends JPanel {
         addPanelWithFade(new DashboardPanel(), "dashboard");
         addPanelWithFade(new KaryawanPanel(), "karyawan");
         addPanelWithFade(new KriteriaPanel(), "kriteria");
-
-        // Inisialisasi dan simpan instance MatrixPanel
+        
         matrixPanel = new MatrixPanel();
         addPanelWithFade(matrixPanel, "matrix");
-
+        LaporanPanel laporanPanel = new LaporanPanel(penilaianPanel,karyawanPanel,matrixPanel, kriteriaPanel);
+        addPanelWithFade(laporanPanel, "laporan");
+        
         addPanelWithFade(new PenilaianPanel(), "penilaian");
     }
 

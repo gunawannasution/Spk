@@ -56,7 +56,8 @@ public class MainFrame extends JFrame{
                     contentPanel.showPanel("penilaian");
                     break;
                 case "laporan":
-                    JOptionPane.showMessageDialog(this, "Fitur Laporan belum tersedia.");
+                    contentPanel.showPanel("laporan");
+                    //JOptionPane.showMessageDialog(this, "Fitur Laporan belum tersedia.");
                     break;
                 case "pengaturan":
                     JOptionPane.showMessageDialog(this, "Pengaturan aplikasi...");

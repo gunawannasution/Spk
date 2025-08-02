@@ -465,7 +465,7 @@ public class MatrixPanel extends JPanel {
             e.printStackTrace();
         }
     }
-    private void printReport() {
+    public void printReport() {
         try {
             List<Matrix> list = dao.getAll();
             if (list.isEmpty()) {

@@ -13,7 +13,6 @@ import com.ahp.content.model.Karyawan;
 import com.ahp.content.model.Kriteria;
 import com.ahp.content.model.MatrixAlternatif;
 import com.ahp.content.model.MatrixAlternatifPrint;
-import com.ahp.helper.MatrixAlternatifConverter;
 import com.ahp.helper.ReportUtil;
 import com.ahp.helper.btnModern;
 import net.miginfocom.swing.MigLayout;
@@ -39,6 +38,7 @@ public class PenilaianPanel extends JPanel {
     
     private final HasilAlternatifDAO hasilDAO = new HasilAlternatifDAOImpl();
     private final MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl();
+    
     private final KaryawanDAO alternatifDAO = new KaryawanDAOImpl();
     private final KriteriaDAO kriteriaDAO = new KriteriaDAOImpl();
     private JTable table, tableHasil;
@@ -683,34 +683,45 @@ private void delete() {
         }
     }
     
-    private void printReport() {
-    try {
-        List<MatrixAlternatif> dataMentah = matrixDAO.getAll();
-        if (dataMentah.isEmpty()) {
-            showInfo("Tidak ada data untuk dicetak.");
-            return;
+    public void printReport() {
+        List<Kriteria> listKriteria = kriteriaDAO.getAll();
+        List<Karyawan> listAlternatif = alternatifDAO.getAll();
+        List<MatrixAlternatifPrint> dataPdf = new ArrayList<>();
+        int no = 1;
+
+       // MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl(); // Buat instance DAO
+
+        for (Karyawan alt : listAlternatif) {
+            List<Double> nilaiPerKriteria = new ArrayList<>();
+            for (Kriteria kri : listKriteria) {
+                // Ambil nilai matrix berdasarkan alternatif dan kriteria
+                MatrixAlternatif m = matrixDAO.getByAlternatifAndKriteria(alt.getId(), kri.getId());
+                nilaiPerKriteria.add(m != null ? m.getNilai() : 0.0);
+            }
+            dataPdf.add(new MatrixAlternatifPrint(no++, alt.getNama(), nilaiPerKriteria));
         }
 
-        int jumlahKriteria = 4;
-        Map<Integer, String> alternatifMap = alternatifDAO.getAllAlternatifAsMap();
-        List<String> namaKriteriaList = Arrays.asList("Kompetensi", "Disiplin", "Tanggung Jawab", "Kerjasama");
-        List<MatrixAlternatifPrint> dataPrint = MatrixAlternatifConverter.groupByAlternatif(dataMentah, jumlahKriteria, alternatifMap);
-        String[] headers = MatrixAlternatifConverter.buatHeaders(jumlahKriteria, namaKriteriaList);
+        String[] headers = new String[listKriteria.size() + 2];
+        headers[0] = "No";
+        headers[1] = "Alternatif";
+        for (int i = 0; i < listKriteria.size(); i++) {
+            headers[i + 2] = listKriteria.get(i).getNama();
+        }
 
-        ReportUtil.generatePdfReport(
-            dataPrint,
-            headers,
-            "Laporan Matriks Alternatif",
-            "laporan_matrix_alternatif",
-            "Jakarta",
-            "Direktur"
-        );
-
-        showInfo("Laporan Matrix Alternatif berhasil dicetak.");
-    } catch (Exception e) {
-        showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+        try {
+            ReportUtil.generatePdfReport(
+                dataPdf,
+                headers,
+                "LAPORAN PENILAIAN KARYAWAN",
+                "laporan_matriks_alternatif",
+                "Jakarta",
+                "Ir. Jannus Simanjuntak"
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
+
 
     private void showInfo(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);

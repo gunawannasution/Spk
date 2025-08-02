@@ -261,7 +261,7 @@ public class KriteriaPanel extends JPanel {
         );
     }
         
-    private void printReport() {
+    public void printReport() {
         try {
             List<Kriteria> list = dao.getAll();
             if (list.isEmpty()) {

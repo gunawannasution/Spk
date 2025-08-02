@@ -48,7 +48,7 @@
             <artifactId>miglayout-swing</artifactId>
             <version>11.4.2</version>
         </dependency>
-        
+
     </dependencies>
     <build>
     <plugins>
@@ -60,14 +60,14 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.0</version>
+            <version>3.1.0</version> 
             <configuration>
                 <executable>java</executable>
                 <arguments>
                     <argument>--enable-native-access=ALL-UNNAMED</argument>
                     <argument>-classpath</argument>
-                    <classpath />
-                    <argument>com.ahp.Main</argument>
+                    <classpath/>
+                    <argument>com.ahp.Main</argument> <!-- class dengan main() -->
                 </arguments>
             </configuration>
         </plugin>

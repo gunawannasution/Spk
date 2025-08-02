@@ -245,7 +245,7 @@ public class KaryawanPanel extends JPanel {
         );
     }
 
-    private void printReport() {
+    public void printReport() {
         try {
             List<Karyawan> list = dao.getAll();
             if (list.isEmpty()) {
