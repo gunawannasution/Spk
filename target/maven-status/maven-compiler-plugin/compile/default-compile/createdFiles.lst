@@ -18,7 +18,6 @@ com\ahp\content\model\MatrixAlternatif.class
 com\ahp\helper\BuatMatrix.class
 com\ahp\content\dao\HasilAlternatifDAOImpl.class
 com\ahp\content\dao\KriteriaDAOImpl.class
-com\ahp\content\KaryawanPanel$2.class
 com\ahp\content\KriteriaPanel.class
 com\ahp\content\PenilaianPanel$8.class
 com\ahp\content\dao\PdfExportable.class
@@ -28,7 +27,6 @@ com\ahp\content\DashboardPanel$ModernTableRenderer.class
 com\ahp\content\DashboardPanel$RoundBorder.class
 com\ahp\content\model\Karyawan.class
 com\ahp\content\KaryawanPanel.class
-com\ahp\content\LaporanPanel1.class
 com\ahp\content\PenilaianPanel$12.class
 com\ahp\helper\LogService.class
 com\ahp\content\PenilaianPanel$4.class
@@ -43,6 +41,7 @@ com\ahp\content\model\Matrix.class
 com\ahp\content\dao\MatrixDAO.class
 com\ahp\content\dao\MatrixAlternatifDAOImpl.class
 com\ahp\helper\FormHelper.class
+com\ahp\helper\UIComponent$FormBuilder.class
 com\ahp\template\HeaderPanel$1.class
 com\ahp\content\model\MatrixAlternatifPrint.class
 com\ahp\content\dao\KriteriaDAO.class
@@ -76,7 +75,6 @@ com\ahp\Main.class
 com\ahp\helper\PerhitunganAHP.class
 com\ahp\content\DashboardPanel$3.class
 com\ahp\content\dao\MatrixDAOImpl.class
-com\ahp\content\KriteriaPanel$2.class
 com\ahp\helper\SearchBox.class
 com\ahp\helper\SearchBox$1.class
 com\ahp\content\DashboardPanel$4.class

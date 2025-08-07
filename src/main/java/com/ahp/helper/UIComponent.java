@@ -13,9 +13,12 @@ public class UIComponent {
     public static final Color SUCCESS_COLOR = new Color(76, 175, 80);
     public static final Color WARNING_COLOR = new Color(255, 193, 7);
     public static final Color DANGER_COLOR = new Color(220, 53, 69);
-    public static final Color ACCENT_COLOR = new Color(220, 53, 69);
+    public static final Color ACCENT_COLOR = new Color(153, 255, 153);
+    public static final Color ADD_COLOR = new Color(0, 153, 0);
+    public static final Color CETAK_COLOR = new Color(0, 155, 153);
+    public static final Color SIMPAN_COLOR = new Color(0,128,255);
     public static final Color TITLE_COLOR = new Color(33, 33, 33);
-    public static final Color TEXT_COLOR = new Color(66, 66, 66);
+    public static final Color TEXT_COLOR = new Color(0, 0, 0);
     public static final Color TEXT_SECONDARY_COLOR = new Color(66, 66, 66);
     public static final Color BORDER_COLOR = new Color(200, 200, 200);
     public static final Color HIGHLIGHT_COLOR = new Color(230, 230, 230);

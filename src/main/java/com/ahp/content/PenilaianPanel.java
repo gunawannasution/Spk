@@ -31,11 +31,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 public class PenilaianPanel extends JPanel {
-    private static final Color PRIMARY_COLOR = new Color(63, 81, 181);
-    private static final Color SECONDARY_COLOR = new Color(233, 30, 99);
-    private static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
-    private static final Color TABLE_HEADER_COLOR = new Color(63, 81, 181);
-    private static final Color TABLE_HEADER_TEXT_COLOR = Color.WHITE;
     
     private final HasilAlternatifDAO hasilDAO = new HasilAlternatifDAOImpl();
     private final MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl();
@@ -45,17 +40,17 @@ public class PenilaianPanel extends JPanel {
     private JTable table, tableHasil;
     private DefaultTableModel model, modelHasil;
     private JComboBox<Karyawan> cbAlternatif;
-    private List<JTextField> kriteriaFields = new ArrayList<>();
+    private final List<JTextField> kriteriaFields = new ArrayList<>();
     private List<Kriteria> allKriteria = new ArrayList<>();
-    private JButton btnSimpan, btnHapus, btnHitungSkor;
+    private btnModern btnSimpan, btnHapus, btnHitungSkor,btnCetak;
 
     public PenilaianPanel() {
         setLayout(new BorderLayout());
-        setBackground(BACKGROUND_COLOR);
+        setBackground(UIComponent.BACKGROUND_COLOR);
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createCompoundBorder(
                 new MatteBorder(1, 1, 1, 1, new Color(220, 220, 220)),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
@@ -65,7 +60,7 @@ public class PenilaianPanel extends JPanel {
         mainPanel.add(panelHasil(), BorderLayout.SOUTH);
         
         add(mainPanel, BorderLayout.CENTER);
-        
+        panelInput();
         initListeners();
         loadData();
     }    
@@ -81,9 +76,7 @@ public class PenilaianPanel extends JPanel {
             public void ancestorMoved(AncestorEvent event) {}
         });
 
-        btnSimpan.addActionListener(e -> save());
-        btnHapus.addActionListener(e -> delete());
-        btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
+        
     }  
     private JPanel panelInput() {
         allKriteria = kriteriaDAO.getAll();
@@ -149,18 +142,15 @@ public class PenilaianPanel extends JPanel {
         }
 
         
-        btnSimpan = new btnModern("Simpan", new Color(0,128,255));
-        btnHapus = new btnModern("Hapus", new Color(255,0,0));
-        btnHitungSkor = new btnModern("Hitung Skor", new Color(76, 175, 80));
-        
-        btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
-        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
-        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
-        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
-        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnCetak.setIconTextGap(6);
+        btnSimpan = new btnModern("Simpan", UIComponent.ADD_COLOR,new ImageIcon(getClass().getResource("/icons/simpan.png")));
+        btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,new ImageIcon(getClass().getResource("/icons/delete.png")));
+        btnHitungSkor = new btnModern("Hitung Skor", UIComponent.PRIMARY_COLOR,new ImageIcon(getClass().getResource("/icons/hitung.png")));
+        btnCetak=new btnModern("Cetak",UIComponent.CETAK_COLOR,new ImageIcon(getClass().getResource("/icons/print.png")));
+        btnSimpan.addActionListener(e -> save());
+        btnHapus.addActionListener(e -> delete());
+        btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
         btnCetak.addActionListener(e -> printReport());
+        
         
         JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         bp.setBackground(Color.WHITE);
@@ -175,7 +165,7 @@ public class PenilaianPanel extends JPanel {
     }
     private JPanel panelTabel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(UIComponent.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(200, 200, 200)), 
             "Data Matrix Alternatif",
@@ -206,7 +196,7 @@ public class PenilaianPanel extends JPanel {
     }
     private JPanel panelHasil() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(UIComponent.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(200, 200, 200)), 
             "HASIL PERHITUNGAN SKOR ALTERNATIF",
@@ -270,8 +260,8 @@ public class PenilaianPanel extends JPanel {
 
         // Styling header
         JTableHeader header = tableHasil.getTableHeader();
-        header.setBackground(TABLE_HEADER_COLOR);
-        header.setForeground(TABLE_HEADER_TEXT_COLOR);
+        header.setBackground(UIComponent.TABLE_HEADER_COLOR);
+        header.setForeground(UIComponent.TABLE_HEADER_TEXT_COLOR);
         header.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
         // Set renderer untuk kolom lainnya

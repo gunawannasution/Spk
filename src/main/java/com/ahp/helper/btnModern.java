@@ -1,24 +1,24 @@
 package com.ahp.helper;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 
 public class btnModern extends JButton {
     private Color baseColor;
     private Color hoverColor;
     private Color pressColor;
     private Color textColor = Color.WHITE;
-    private int arc = 14;
+    private int arc = 16;
     private boolean showShadow = true;
-    private float shadowOpacity = 0.2f;
+    private float shadowOpacity = 0.15f;
     private int shadowSize = 4;
-    private Icon icon;
     private int iconTextGap = 6;
 
-    // State flags
     private boolean isHover = false;
     private boolean isPressed = false;
 
@@ -35,7 +35,9 @@ public class btnModern extends JButton {
         this.baseColor = color;
         this.hoverColor = color.darker();
         this.pressColor = color.darker().darker();
-        this.icon = icon;
+        if (icon != null) {
+            setIcon(scaleIcon(icon, 18, 18)); // Auto-resize icon
+        }
         initStyle();
         initMouseEffects();
     }
@@ -49,16 +51,12 @@ public class btnModern extends JButton {
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         setHorizontalAlignment(SwingConstants.CENTER);
-        setHorizontalTextPosition(SwingConstants.CENTER);
+        setHorizontalTextPosition(SwingConstants.RIGHT);
         setVerticalAlignment(SwingConstants.CENTER);
         setVerticalTextPosition(SwingConstants.CENTER);
         setIconTextGap(iconTextGap);
 
-        if (icon != null) {
-            setIcon(icon);
-        }
-
-        setBackground(baseColor); // langsung aktif
+        setBackground(baseColor);
     }
 
     private void initMouseEffects() {
@@ -96,14 +94,12 @@ public class btnModern extends JButton {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         Color currentColor = baseColor;
-
         if (isPressed) {
             currentColor = pressColor;
         } else if (isHover) {
             currentColor = hoverColor;
         }
 
-        // Shadow
         if (showShadow && isHover && isEnabled()) {
             g2.setColor(new Color(0, 0, 0, (int) (255 * shadowOpacity)));
             g2.fill(new RoundRectangle2D.Double(
@@ -113,7 +109,6 @@ public class btnModern extends JButton {
             ));
         }
 
-        // Background always active
         g2.setColor(currentColor);
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
 
@@ -121,12 +116,16 @@ public class btnModern extends JButton {
         super.paintComponent(g);
     }
 
-    @Override
-    protected void paintBorder(Graphics g) {
-        // No border
+    private Icon scaleIcon(Icon icon, int width, int height) {
+        if (icon instanceof ImageIcon) {
+            Image img = ((ImageIcon) icon).getImage();
+            Image scaled = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
+        }
+        return icon;
     }
 
-    // === Setters ===
+    // === Optional setters ===
     public void setBaseColor(Color color) {
         this.baseColor = color;
         this.hoverColor = color.darker();
@@ -176,7 +175,7 @@ public class btnModern extends JButton {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        return new Dimension(size.width + 20, size.height + 10);
+        return new Dimension(size.width + 24, size.height + 12);
     }
 
     @Override

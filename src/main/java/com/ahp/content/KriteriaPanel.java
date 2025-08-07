@@ -10,15 +10,14 @@ import com.ahp.helper.btnModern;
 import com.ahp.helper.SearchBox;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.util.List;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.util.List;
 import org.jdesktop.swingx.prompt.PromptSupport;
 
 public class KriteriaPanel extends JPanel {
 
-    private final btnModern btnTambah, btnCetak,btnHapus;
+    private final btnModern btnTambah, btnCetak, btnHapus;
     private BuatTable<Kriteria> tablePanel;
     private final KriteriaDAO dao = new KriteriaDAOImpl();
 
@@ -30,33 +29,21 @@ public class KriteriaPanel extends JPanel {
         lblJudul.setForeground(new Color(33, 33, 33));
         lblJudul.setBorder(new EmptyBorder(10, 15, 5, 15));
 
-        btnTambah = new btnModern("Tambah", new Color(76, 175, 80));
-        ImageIcon iconTambah = new ImageIcon(getClass().getResource("/icons/tambah.png"));
-        Image scaledTambah = iconTambah.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnTambah.setIcon(new ImageIcon(scaledTambah));
-        btnTambah.setHorizontalAlignment(SwingConstants.LEFT);
-        btnTambah.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnTambah.setIconTextGap(6);
+        btnTambah = new btnModern("Tambah", UIComponent.ADD_COLOR,
+                new ImageIcon(getClass().getResource("/icons/add.png")));
         btnTambah.addActionListener(e -> inputData(null));
+        setupButtonAlignment(btnTambah);
 
-        btnCetak = new btnModern("Print", new Color(96, 125, 139));
-        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
-        Image scaledPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnCetak.setIcon(new ImageIcon(scaledPrint));
-        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
-        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnCetak.setIconTextGap(6);
+        btnCetak = new btnModern("Cetak", UIComponent.CETAK_COLOR,
+                new ImageIcon(getClass().getResource("/icons/print.png")));
         btnCetak.addActionListener(e -> printReport());
-        
-        
-        btnHapus = new btnModern("Print", new Color(96, 125, 139));
-        ImageIcon iconDelete = new ImageIcon(getClass().getResource("/icons/print.png"));
-        Image scaledDelete = iconDelete.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnHapus.setIcon(new ImageIcon(scaledDelete));
-        btnHapus.setHorizontalAlignment(SwingConstants.LEFT);
-        btnHapus.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnHapus.setIconTextGap(6);
-        btnHapus.addActionListener(e -> printReport());
+        setupButtonAlignment(btnCetak);
+
+        btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,
+                new ImageIcon(getClass().getResource("/icons/delete.png")));
+        btnHapus.setEnabled(false);
+        btnHapus.addActionListener(e -> hapusDataTerpilih());
+        setupButtonAlignment(btnHapus);
 
         SearchBox search = new SearchBox("Cari data...", this::filterPencarian);
         search.setMaximumSize(new Dimension(250, 36));
@@ -83,12 +70,16 @@ public class KriteriaPanel extends JPanel {
         add(panelAtasGabungan, BorderLayout.NORTH);
 
         tableKriteria();
-        tidakKlikTable();
+    }
+
+    private void setupButtonAlignment(AbstractButton btn) {
+        btn.setHorizontalAlignment(SwingConstants.LEFT);
+        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btn.setIconTextGap(6);
     }
 
     private void inputData(Kriteria k) {
         boolean isEdit = (k != null);
-
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
                 isEdit ? "Edit Kriteria" : "Tambah Kriteria",
                 Dialog.ModalityType.APPLICATION_MODAL);
@@ -210,20 +201,28 @@ public class KriteriaPanel extends JPanel {
         tablePanel = new BuatTable<>(
                 cols,
                 list,
-                k -> new Object[]{k.getId(), k.getKode(), k.getNama(), k.getKet(), k.getBobot()}
+                k -> new Object[]{k.getId(), k.getKode(), k.getNama(), k.getKet(), String.format("%.4f", k.getBobot())}
         );
-        tablePanel.getTable().addMouseListener(new java.awt.event.MouseAdapter() {
+
+        JTable table = tablePanel.getTable();
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JTable t = tablePanel.getTable();
-                int row = t.rowAtPoint(evt.getPoint());
+                int row = table.rowAtPoint(evt.getPoint());
                 if (evt.getClickCount() == 2 && row != -1) {
-                    Kriteria k = tablePanel.getRowData(row);
-                    btnTambah.setText("Update Kriteria");
+                    int modelRow = table.convertRowIndexToModel(row);
+                    Kriteria k = tablePanel.getRowData(modelRow);
+                    btnTambah.setText("Update");
                     inputData(k);
-                } else if (evt.getClickCount() == 1 && row == -1) {
-                    btnTambah.setText("Tambah Kriteria");
                 }
+            }
+        });
+
+        // Enable tombol Hapus saat baris dipilih
+        table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                btnHapus.setEnabled(table.getSelectedRow() != -1);
             }
         });
 
@@ -231,20 +230,10 @@ public class KriteriaPanel extends JPanel {
     }
 
     private void refreshTabel() {
-        remove(tablePanel);
-        tableKriteria();
-        revalidate();
-        repaint();
-    }
-
-    private ActionListener tidakKlikTable() {
-        this.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnTambah.setText("Tambah Kriteria");
-            }
-        });
-        return null;
+        List<Kriteria> list = dao.getAll();
+        tablePanel.refreshData(list, k ->
+                new Object[]{k.getId(), k.getKode(), k.getNama(), k.getKet(), String.format("%.4f", k.getBobot())}
+        );
     }
 
     private void filterPencarian(String keyword) {
@@ -260,11 +249,41 @@ public class KriteriaPanel extends JPanel {
         );
     }
 
+    private void hapusDataTerpilih() {
+        int viewRow = tablePanel.getTable().getSelectedRow();
+        if (viewRow == -1) {
+            showInfo("Pilih data yang ingin dihapus terlebih dahulu.");
+            return;
+        }
+
+        int modelRow = tablePanel.getTable().convertRowIndexToModel(viewRow);
+        Kriteria k = tablePanel.getRowData(modelRow);
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Apakah Anda yakin ingin menghapus data kriteria dengan id: " + k.getId() + "?",
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean deleted = dao.delete(k.getId());
+            if (deleted) {
+                showInfo("Data berhasil dihapus.");
+                refreshTabel();
+                btnHapus.setEnabled(false);
+                btnTambah.setText("Tambah");
+            } else {
+                showError("Gagal menghapus data.", "Error");
+            }
+        }
+    }
+
     public void printReport() {
         try {
             List<Kriteria> list = dao.getAll();
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                showInfo("Tidak ada data kriteria untuk dicetak.");
                 return;
             }
 
@@ -290,5 +309,3 @@ public class KriteriaPanel extends JPanel {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 }
-
-
