@@ -732,24 +732,27 @@ public class PenilaianPanel extends JPanel {
     public void printReportHasil() {
         try {
             List<HasilAlternatif> list = hasilDAO.getAll();
+
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                showInfo("Tidak ada data hasil alternatif untuk dicetak.");
                 return;
             }
 
             ReportUtil.generatePdfReport(
                 list,
-                new String[]{"No", "NIK", "Nama", "Jabatan", "Alamat"},
-                "Laporan Data Karyawan",
-                "laporan_karyawan",
+                new String[]{"Peringkat", "Nama", "Skor", "Rekomendasi"},
+                "Laporan Hasil Alternatif",
+                "laporan_hasil_alternatif",
                 "Jakarta",
                 "GUNAWAN"
             );
+
             showInfo("Laporan berhasil dibuat.");
         } catch (Exception e) {
             showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
         }
     }
+
     private void showInfo(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
     }

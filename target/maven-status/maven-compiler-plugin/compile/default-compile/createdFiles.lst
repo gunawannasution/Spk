@@ -7,6 +7,7 @@ com\ahp\content\PenilaianPanel$10.class
 com\ahp\content\DashboardPanel$3$2.class
 com\ahp\helper\btnModern$1.class
 com\ahp\template\FooterPanel.class
+com\ahp\content\LaporanPanel$2.class
 com\ahp\template\SidebarPanel$1.class
 com\ahp\helper\libButton.class
 com\ahp\login\FormLogin$1.class
@@ -28,6 +29,7 @@ com\ahp\content\model\Karyawan.class
 com\ahp\content\KaryawanPanel.class
 com\ahp\content\LaporanPanel1.class
 com\ahp\content\PenilaianPanel$12.class
+com\ahp\helper\LogService.class
 com\ahp\content\PenilaianPanel$4.class
 com\ahp\content\DashboardPanel$1.class
 com\ahp\content\PenilaianPanel$9.class
@@ -66,7 +68,6 @@ com\ahp\content\KaryawanPanel$1.class
 com\ahp\content\PenilaianPanel$1.class
 com\ahp\content\MatrixPanel.class
 com\ahp\util\DBConnection.class
-com\ahp\login\FormLogin$3.class
 com\ahp\Main.class
 com\ahp\helper\PerhitunganAHP.class
 com\ahp\content\DashboardPanel$3.class

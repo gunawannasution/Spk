@@ -34,13 +34,12 @@ public class KaryawanPanel extends JPanel {
         btnTambah.setIcon(createIcon("/icons/tambah.png"));
         btnTambah.addActionListener(e -> inputData(null));
         setupButtonAlignment(btnTambah);
-        
-        btnHapus = new btnModern("Hapus", new Color(244, 67, 54)); // tombol hapus merah
-        //btnHapus.setIcon(createIcon("/icons/hapus.png")); // pastikan ada ikon hapus.png
-        btnHapus.setEnabled(false); // awalnya disabled
-        setupButtonAlignment(btnHapus);
+
+        btnHapus = new btnModern("Hapus", new Color(244, 67, 54));
+        btnHapus.setEnabled(false);
         btnHapus.addActionListener(e -> hapusDataTerpilih());
-        
+        setupButtonAlignment(btnHapus);
+
         btnCetak = new btnModern("Print", new Color(96, 125, 139));
         btnCetak.setIcon(createIcon("/icons/print.png"));
         btnCetak.addActionListener(e -> printReport());
@@ -57,6 +56,8 @@ public class KaryawanPanel extends JPanel {
         panelBtnSearch.setBorder(new EmptyBorder(10, 10, 10, 10));
         panelBtnSearch.add(btnTambah);
         panelBtnSearch.add(Box.createRigidArea(new Dimension(10, 0)));
+        panelBtnSearch.add(btnHapus);
+        panelBtnSearch.add(Box.createRigidArea(new Dimension(10, 0)));
         panelBtnSearch.add(btnCetak);
         panelBtnSearch.add(Box.createHorizontalGlue());
         panelBtnSearch.add(search);
@@ -67,7 +68,6 @@ public class KaryawanPanel extends JPanel {
         panelHeader.add(panelBtnSearch, BorderLayout.SOUTH);
 
         add(panelHeader, BorderLayout.NORTH);
-
         tableKaryawan();
         add(tablePanel, BorderLayout.CENTER);
 
@@ -75,6 +75,7 @@ public class KaryawanPanel extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 resetBtnTambah();
+                btnHapus.setEnabled(false);
             }
         });
     }
@@ -205,24 +206,28 @@ public class KaryawanPanel extends JPanel {
         String[] cols = {"ID", "NIK", "Nama", "Jabatan", "Alamat"};
         List<Karyawan> list = dao.getAll();
 
-        tablePanel = new BuatTable<>(
-                cols,
-                list,
-                k -> new Object[]{k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()}
-        );
+        tablePanel = new BuatTable<>(cols, list, k -> new Object[]{
+                k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()
+        });
 
         tablePanel.getTable().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 JTable t = tablePanel.getTable();
                 int row = t.rowAtPoint(evt.getPoint());
-                if (evt.getClickCount() == 2 && row != -1) {
-                    Karyawan k = tablePanel.getRowData(row);
-                    btnTambah.setText("Update");
-                    btnTambah.setEnabled(false);
-                    inputData(k);
-                } else if (evt.getClickCount() == 1 && row == -1) {
+
+                if (row != -1) {
+                    if (evt.getClickCount() == 2) {
+                        Karyawan k = tablePanel.getRowData(row);
+                        btnTambah.setText("Update");
+                        btnTambah.setEnabled(false);
+                        inputData(k);
+                    } else if (evt.getClickCount() == 1) {
+                        btnHapus.setEnabled(true);
+                    }
+                } else {
                     resetBtnTambah();
+                    btnHapus.setEnabled(false);
                 }
             }
         });
@@ -250,7 +255,13 @@ public class KaryawanPanel extends JPanel {
         tablePanel.refreshData(filtered, k ->
                 new Object[]{k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()}
         );
+
+        // Nonaktifkan tombol hapus kalau hasil pencarian kosong
+        if (filtered.isEmpty()) {
+            btnHapus.setEnabled(false);
+        }
     }
+
     private void hapusDataTerpilih() {
         int selectedRow = tablePanel.getTable().getSelectedRow();
         if (selectedRow == -1) {
@@ -279,6 +290,7 @@ public class KaryawanPanel extends JPanel {
             }
         }
     }
+
     public void printReport() {
         try {
             List<Karyawan> list = dao.getAll();

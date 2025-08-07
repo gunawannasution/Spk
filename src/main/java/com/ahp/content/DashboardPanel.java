@@ -134,10 +134,12 @@ public class DashboardPanel extends JPanel {
 
     private String getActivityLog() {
         StringBuilder log = new StringBuilder();
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement()) {
+        String query = "SELECT aktivitas FROM log_aktivitas ORDER BY waktu DESC LIMIT 5";
 
-            ResultSet rs = stmt.executeQuery("SELECT aktivitas FROM log_aktivitas ORDER BY waktu DESC LIMIT 5");
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
             int no = 1;
             while (rs.next()) {
                 log.append(no++).append(". ").append(rs.getString("aktivitas")).append("\n");
@@ -214,7 +216,7 @@ public class DashboardPanel extends JPanel {
         ));
         panel.setPreferredSize(new Dimension(600, 180));
 
-        JLabel title = new JLabel("🏆 3 Terbaik");
+        JLabel title = new JLabel("#3 Terbaik#");
         title.setFont(UIComponent.FONT_BOLD.deriveFont(16f));
         title.setForeground(UIComponent.TEXT_COLOR);
         title.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));

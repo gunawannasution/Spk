@@ -24,7 +24,7 @@ public class LaporanPanel1 extends JPanel {
         setBackground(UIComponent.BACKGROUND_COLOR);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JButton printMatrixAlternatif = createButton("Cetak Matriks Alternatif","/icons/print.png",
+        JButton printNilaiKaryawan = createButton("Cetak Nilai Karyawan","/icons/print.png",
             () -> {
                 if (penilaianPanel != null) {
                     penilaianPanel.printReport();
@@ -35,9 +35,9 @@ public class LaporanPanel1 extends JPanel {
         );
         
 
-        add(printMatrixAlternatif);
-        add(createButton("Cetak Karyawan", "/icons/print.png", () -> karyawanPanel.printReport()));
-        add(createButton("Matrix Alternatif", "/icons/print.png", () -> matrixPanel.printReport()));
+        add(printNilaiKaryawan);
+        add(createButton("Cetak Data Karyawan", "/icons/print.png", () -> karyawanPanel.printReport()));
+        add(createButton("Cetak Nilai Bobot Perbandingan", "/icons/print.png", () -> matrixPanel.printReport()));
         add(createButton("Cetak Kriteria", "/icons/print.png", () -> kriteriaPanel.printReport()));
     }
 

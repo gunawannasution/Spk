@@ -25,6 +25,8 @@ public class UIComponent {
     public static final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 14);
     public static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 16);
+    public static final Font FONT_PLAIN = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_MEDIUM = new Font("Segoe UI", Font.PLAIN, 14);
     public static Font FONT_SMALL;
 
     // Label dengan style modern
