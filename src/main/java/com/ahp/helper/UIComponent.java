@@ -221,5 +221,40 @@ public class UIComponent {
         button.setContentAreaFilled(true); // biar FlatLaf styling jalan dengan baik
         return button;
     }
-    
+    public class FormBuilder extends JPanel {
+    private final GridBagConstraints gbc;
+    private int row = 0;
+
+    public FormBuilder() {
+        setLayout(new GridBagLayout());
+        setBackground(UIComponent.CARD_COLOR); // opsional jika pakai tema
+        gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+    }
+
+    public void addField(String labelText, JComponent inputComponent) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+        this.add(new JLabel(labelText + ":"), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = row;
+        gbc.gridwidth = 2;
+        this.add(inputComponent, gbc);
+
+        row++;
+    }
+
+    public void addFullRow(JComponent component) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 3;
+        this.add(component, gbc);
+        row++;
+    }
+}
 }

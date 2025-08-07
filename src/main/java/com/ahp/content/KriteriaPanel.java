@@ -18,7 +18,7 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 
 public class KriteriaPanel extends JPanel {
 
-    private final btnModern btnTambah, btnCetak;
+    private final btnModern btnTambah, btnCetak,btnHapus;
     private BuatTable<Kriteria> tablePanel;
     private final KriteriaDAO dao = new KriteriaDAOImpl();
 
@@ -47,6 +47,16 @@ public class KriteriaPanel extends JPanel {
         btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
         btnCetak.setIconTextGap(6);
         btnCetak.addActionListener(e -> printReport());
+        
+        
+        btnHapus = new btnModern("Print", new Color(96, 125, 139));
+        ImageIcon iconDelete = new ImageIcon(getClass().getResource("/icons/print.png"));
+        Image scaledDelete = iconDelete.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        btnHapus.setIcon(new ImageIcon(scaledDelete));
+        btnHapus.setHorizontalAlignment(SwingConstants.LEFT);
+        btnHapus.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btnHapus.setIconTextGap(6);
+        btnHapus.addActionListener(e -> printReport());
 
         SearchBox search = new SearchBox("Cari data...", this::filterPencarian);
         search.setMaximumSize(new Dimension(250, 36));
@@ -57,6 +67,8 @@ public class KriteriaPanel extends JPanel {
         atasPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         atasPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         atasPanel.add(btnTambah);
+        atasPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        atasPanel.add(btnHapus);
         atasPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         atasPanel.add(btnCetak);
         atasPanel.add(Box.createRigidArea(new Dimension(20, 0)));
@@ -278,3 +290,5 @@ public class KriteriaPanel extends JPanel {
         JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 }
+
+
