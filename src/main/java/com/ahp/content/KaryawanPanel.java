@@ -17,7 +17,7 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 
 public class KaryawanPanel extends JPanel {
 
-    private final btnModern btnTambah, btnCetak;
+    private final btnModern btnTambah, btnCetak, btnHapus;
     private BuatTable<Karyawan> tablePanel;
     private final KaryawanDAO dao = new KaryawanDAOImpl();
 
@@ -34,7 +34,13 @@ public class KaryawanPanel extends JPanel {
         btnTambah.setIcon(createIcon("/icons/tambah.png"));
         btnTambah.addActionListener(e -> inputData(null));
         setupButtonAlignment(btnTambah);
-
+        
+        btnHapus = new btnModern("Hapus", new Color(244, 67, 54)); // tombol hapus merah
+        //btnHapus.setIcon(createIcon("/icons/hapus.png")); // pastikan ada ikon hapus.png
+        btnHapus.setEnabled(false); // awalnya disabled
+        setupButtonAlignment(btnHapus);
+        btnHapus.addActionListener(e -> hapusDataTerpilih());
+        
         btnCetak = new btnModern("Print", new Color(96, 125, 139));
         btnCetak.setIcon(createIcon("/icons/print.png"));
         btnCetak.addActionListener(e -> printReport());
@@ -45,7 +51,6 @@ public class KaryawanPanel extends JPanel {
         search.setMaximumSize(searchDim);
         search.setPreferredSize(searchDim);
 
-        // Panel tombol dan search
         JPanel panelBtnSearch = new JPanel();
         panelBtnSearch.setLayout(new BoxLayout(panelBtnSearch, BoxLayout.X_AXIS));
         panelBtnSearch.setBackground(UIComponent.BACKGROUND_COLOR);
@@ -56,7 +61,6 @@ public class KaryawanPanel extends JPanel {
         panelBtnSearch.add(Box.createHorizontalGlue());
         panelBtnSearch.add(search);
 
-        // Panel header berisi judul dan tombol+search
         JPanel panelHeader = new JPanel(new BorderLayout());
         panelHeader.setBackground(UIComponent.BACKGROUND_COLOR);
         panelHeader.add(lblJudul, BorderLayout.NORTH);
@@ -96,7 +100,8 @@ public class KaryawanPanel extends JPanel {
         JTextField txtNik = UIComponent.buatTxt(20);
         JTextField txtNama = UIComponent.buatTxt(20);
         JComboBox<String> cmbJabatan = UIComponent.buatCmb(
-            new String[]{"Manager Keuangan", "Manager Teknik", "Staf", "Karyawan"}, new ImageIcon("")
+                new String[]{"Manager Keuangan", "Manager Teknik", "Staf", "Karyawan"},
+                null
         );
         JTextField txtAlamat = UIComponent.buatTxt(20);
 
@@ -136,7 +141,7 @@ public class KaryawanPanel extends JPanel {
             if (result) {
                 JOptionPane.showMessageDialog(dialog, isEdit ? "Data berhasil diubah." : "Data berhasil ditambahkan.");
                 dialog.dispose();
-                refreshTabel(); // Refresh tabel setelah simpan/update
+                refreshTabel();
             } else {
                 JOptionPane.showMessageDialog(dialog, "Terjadi kesalahan saat menyimpan data.");
             }
@@ -150,22 +155,26 @@ public class KaryawanPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         formPanel.add(new JLabel("NIK:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtNik, gbc);
 
-        gbc.gridx = 0; gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridy++;
         formPanel.add(new JLabel("Nama:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtNama, gbc);
 
-        gbc.gridx = 0; gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridy++;
         formPanel.add(new JLabel("Jabatan:"), gbc);
         gbc.gridx = 1;
         formPanel.add(cmbJabatan, gbc);
 
-        gbc.gridx = 0; gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridy++;
         formPanel.add(new JLabel("Alamat:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtAlamat, gbc);
@@ -234,15 +243,42 @@ public class KaryawanPanel extends JPanel {
     private void filterPencarian(String keyword) {
         String lower = keyword.toLowerCase();
         List<Karyawan> filtered = dao.getAll().stream()
-            .filter(k -> k.getNik().toLowerCase().contains(lower)
-                      || k.getNama().toLowerCase().contains(lower))
-            .toList();
+                .filter(k -> k.getNik().toLowerCase().contains(lower)
+                        || k.getNama().toLowerCase().contains(lower))
+                .toList();
 
         tablePanel.refreshData(filtered, k ->
-            new Object[]{k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()}
+                new Object[]{k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()}
         );
     }
+    private void hapusDataTerpilih() {
+        int selectedRow = tablePanel.getTable().getSelectedRow();
+        if (selectedRow == -1) {
+            showInfo("Pilih data yang ingin dihapus terlebih dahulu.");
+            return;
+        }
 
+        Karyawan k = tablePanel.getRowData(selectedRow);
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Apakah Anda yakin ingin menghapus data karyawan dengan NIK: " + k.getNik() + "?",
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean deleted = dao.delete(k.getId());
+            if (deleted) {
+                showInfo("Data berhasil dihapus.");
+                refreshTabel();
+                resetBtnTambah();
+                btnHapus.setEnabled(false);
+            } else {
+                showError("Gagal menghapus data.", "Error");
+            }
+        }
+    }
     public void printReport() {
         try {
             List<Karyawan> list = dao.getAll();
@@ -252,12 +288,12 @@ public class KaryawanPanel extends JPanel {
             }
 
             ReportUtil.generatePdfReport(
-                list,
-                new String[]{"No", "NIK", "Nama", "Jabatan", "Alamat"},
-                "Laporan Data Karyawan",
-                "laporan_karyawan",
-                "Jakarta",
-                "GUNAWAN"
+                    list,
+                    new String[]{"No", "NIK", "Nama", "Jabatan", "Alamat"},
+                    "Laporan Data Karyawan",
+                    "laporan_karyawan",
+                    "Jakarta",
+                    "GUNAWAN"
             );
             showInfo("Laporan berhasil dibuat.");
         } catch (Exception e) {

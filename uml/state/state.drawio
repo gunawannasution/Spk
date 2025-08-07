@@ -1,0 +1,88 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="State Machine AHP Karyawan" id="state_machine_ahp">
+    <mxGraphModel dx="1028" dy="754" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Initial State -->
+        <mxCell id="start" value="" style="ellipse;fillColor=#000000;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="20" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Login -->
+        <mxCell id="login" value="Login" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="50" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="startToLogin" style="endArrow=block;" edge="1" parent="1" source="start" target="login">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Dashboard -->
+        <mxCell id="dashboard" value="Dashboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="50" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="loginToDashboard" value="Login sukses" style="endArrow=block;" edge="1" parent="1" source="login" target="dashboard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Kelola Alternatif -->
+        <mxCell id="kelolaAlt" value="Kelola Alternatif" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="120" width="140" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dashToAlt" value="Klik menu Alternatif" style="endArrow=block;" edge="1" parent="1" source="dashboard" target="kelolaAlt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Kelola Kriteria -->
+        <mxCell id="kelolaKri" value="Kelola Kriteria" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="190" width="140" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dashToKri" value="Klik menu Kriteria" style="endArrow=block;" edge="1" parent="1" source="dashboard" target="kelolaKri">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Input Nilai -->
+        <mxCell id="inputNilai" value="Input Nilai Alternatif" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="260" width="160" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dashToNilai" value="Klik Input Nilai" style="endArrow=block;" edge="1" parent="1" source="dashboard" target="inputNilai">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Proses AHP -->
+        <mxCell id="prosesAHP" value="Proses AHP" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="nilaiToAHP" value="Input selesai" style="endArrow=block;" edge="1" parent="1" source="inputNilai" target="prosesAHP">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Lihat Hasil -->
+        <mxCell id="lihatHasil" value="Tampilkan Hasil" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="170" width="140" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="ahpToHasil" value="Proses selesai" style="endArrow=block;" edge="1" parent="1" source="prosesAHP" target="lihatHasil">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Cetak Hasil -->
+        <mxCell id="cetakHasil" value="Cetak Hasil" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="240" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="hasilToCetak" value="Klik cetak" style="endArrow=block;" edge="1" parent="1" source="lihatHasil" target="cetakHasil">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Final -->
+        <mxCell id="end" value="" style="ellipse;fillColor=#000000;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="660" y="250" width="20" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="cetakToEnd" style="endArrow=block;" edge="1" parent="1" source="cetakHasil" target="end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

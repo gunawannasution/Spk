@@ -1,6 +1,7 @@
 package com.ahp.template;
 
 import com.formdev.flatlaf.FlatClientProperties;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -25,34 +26,38 @@ public class SidebarPanel extends JPanel {
         setBackground(COLOR_BG);
         setPreferredSize(new Dimension(220, Integer.MAX_VALUE));
 
-        add(Box.createVerticalStrut(20)); 
+        add(Box.createVerticalStrut(20)); // spasi atas
+
+        // Tambahkan item menu
         addMenuItem("Dashboard", "dashboard", "/icons/dashboard.png");
         addMenuItem("Karyawan", "karyawan", "/icons/karyawan.png");
         addMenuItem("Kriteria", "kriteria", "/icons/kriteria.png");
-        addMenuItem("Matrix", "matrix", "/icons/matrix.png");
+        addMenuItem("Perhitungan", "matrix", "/icons/matrix.png");
         addMenuItem("Penilaian", "penilaian", "/icons/penilaian.png");
         addMenuItem("Laporan", "laporan", "/icons/laporan.png");
-        addMenuItem("Pengaturan", "pengaturan", "/icons/pengaturan.png");
 
-        add(Box.createVerticalGlue());
+        // Tambahkan menu Logout dengan actionCommand yang JELAS
+        addMenuItem("Logout", "logout", "/icons/logout.png");
+
+        add(Box.createVerticalGlue()); // dorong ke atas
     }
 
     private void addMenuItem(String label, String actionCommand, String iconPath) {
         ImageIcon icon = loadIcon(iconPath);
         JButton button = new JButton(label, icon);
 
-        // Konfigurasi FlatLaf untuk button
+        // Konfigurasi FlatLaf
         button.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_BORDERLESS);
-        button.putClientProperty(FlatClientProperties.STYLE, 
-            "arc: 0;" +
-            "borderWidth: 0;" +
-            "focusWidth: 0;" +
-            "margin: 10,20,10,10;" +
-            "iconTextGap: 12;" +
-            "foreground: #f0f0f0;" +
-            "background: $Panel.background;" +
-            "hoverBackground: #2c2c30;" +
-            "selectedBackground: #3c3f41");
+        button.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 0;" +
+                        "borderWidth: 0;" +
+                        "focusWidth: 0;" +
+                        "margin: 10,20,10,10;" +
+                        "iconTextGap: 12;" +
+                        "foreground: #f0f0f0;" +
+                        "background: $Panel.background;" +
+                        "hoverBackground: #2c2c30;" +
+                        "selectedBackground: #3c3f41");
 
         button.setActionCommand(actionCommand);
         button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -64,7 +69,7 @@ public class SidebarPanel extends JPanel {
         button.setOpaque(true);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Hover & active state
+        // Hover dan klik
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -90,7 +95,26 @@ public class SidebarPanel extends JPanel {
             }
         });
 
-        button.addActionListener(e -> setActiveButton(button));
+        // Action klik
+        button.addActionListener(e -> {
+            setActiveButton(button);
+
+            String cmd = e.getActionCommand();
+            if ("logout".equals(cmd)) {
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "Apakah Anda yakin ingin keluar?",
+                        "Konfirmasi Logout",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    System.exit(0); // Keluar dari aplikasi
+                }
+            }
+
+            // TODO: tambahkan aksi lain di sini sesuai kebutuhan (buka panel, dsb.)
+        });
 
         menuButtons.add(button);
         add(button);
@@ -101,7 +125,7 @@ public class SidebarPanel extends JPanel {
         try {
             return new ImageIcon(getClass().getResource(path));
         } catch (Exception e) {
-            System.err.println("❌ Icon not found: " + path);
+            System.err.println("❌ Icon tidak ditemukan: " + path);
             return null;
         }
     }

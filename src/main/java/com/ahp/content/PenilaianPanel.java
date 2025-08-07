@@ -314,6 +314,10 @@ public class PenilaianPanel extends JPanel {
                 loadTable();
                 return null;
             }
+            @Override
+            protected void done() {
+                loadHasil(); // agar hasil langsung tampil saat panel dibuka
+            }
         };
         w.execute();
     }
@@ -576,10 +580,9 @@ public class PenilaianPanel extends JPanel {
 
                         peringkat++;
                     }
-
+                    loadHasil();
                     // Refresh tampilan tabel
                     tableHasil.updateUI();
-
                     JOptionPane.showMessageDialog(PenilaianPanel.this, 
                         "Perhitungan skor berhasil diselesaikan", 
                         "Sukses", JOptionPane.INFORMATION_MESSAGE);
@@ -654,6 +657,40 @@ public class PenilaianPanel extends JPanel {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
     }
+    //tampilhasil
+    private void loadHasil() {
+        SwingWorker<List<HasilAlternatif>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<HasilAlternatif> doInBackground() {
+                return hasilDAO.getAll();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    modelHasil.setRowCount(0);
+                    List<HasilAlternatif> hasilList = get();
+
+                    // Urutkan berdasarkan peringkat (semestinya sudah terurut di DB, tapi just in case)
+                    hasilList.sort(Comparator.comparingInt(HasilAlternatif::getPeringkat));
+
+                    for (HasilAlternatif ha : hasilList) {
+                        Karyawan karyawan = alternatifDAO.getById(ha.getIdAlternatif());
+                        modelHasil.addRow(new Object[]{
+                            ha.getPeringkat(),
+                            karyawan != null ? karyawan.getNama() : "Tidak ditemukan",
+                            String.format("%.4f", ha.getSkor()),
+                            ha.getRekomendasi()
+                        });
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    showError("Gagal memuat data hasil: " + e.getMessage(), "Error");
+                }
+            }
+        };
+        worker.execute();
+    }
+
     public void printReport() {
         List<Kriteria> listKriteria = kriteriaDAO.getAll();
         List<Karyawan> listAlternatif = alternatifDAO.getAll();

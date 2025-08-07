@@ -66,4 +66,30 @@ public class HasilAlternatifDAOImpl implements HasilAlternatifDAO {
 
         return list;
     }
+
+    @Override
+    public List<HasilAlternatif> getTopHasil(int limit) {
+        List<HasilAlternatif> list = new ArrayList<>();
+        String sql = "SELECT * FROM hasil_alternatif ORDER BY skor DESC LIMIT ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                HasilAlternatif ha = new HasilAlternatif();
+                ha.setId(rs.getInt("id"));
+                ha.setIdAlternatif(rs.getInt("id_alternatif"));
+                ha.setSkor(rs.getDouble("skor"));
+                ha.setPeringkat(rs.getInt("peringkat"));
+                ha.setRekomendasi(rs.getString("rekomendasi"));
+                list.add(ha);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    return list;
+    }
 }

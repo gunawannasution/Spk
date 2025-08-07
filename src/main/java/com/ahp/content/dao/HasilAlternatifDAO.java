@@ -6,4 +6,5 @@ public interface HasilAlternatifDAO {
     void insert(HasilAlternatif hasil);
     void deleteAll();
     List<HasilAlternatif> getAll();
+    List<HasilAlternatif> getTopHasil(int limit);
 }
