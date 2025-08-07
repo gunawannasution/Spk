@@ -4,7 +4,6 @@ com\ahp\helper\btnModern.class
 com\ahp\helper\BuatTable$2.class
 com\ahp\content\KriteriaPanel$1.class
 com\ahp\content\PenilaianPanel$10.class
-com\ahp\content\DashboardPanel$3$2.class
 com\ahp\helper\btnModern$1.class
 com\ahp\template\FooterPanel.class
 com\ahp\content\LaporanPanel$2.class
@@ -25,6 +24,8 @@ com\ahp\content\PenilaianPanel$8.class
 com\ahp\content\dao\PdfExportable.class
 com\ahp\helper\UIComponent$2.class
 com\ahp\helper\libButton$ButtonType.class
+com\ahp\content\DashboardPanel$ModernTableRenderer.class
+com\ahp\content\DashboardPanel$RoundBorder.class
 com\ahp\content\model\Karyawan.class
 com\ahp\content\KaryawanPanel.class
 com\ahp\content\LaporanPanel1.class
@@ -42,6 +43,7 @@ com\ahp\content\model\Matrix.class
 com\ahp\content\dao\MatrixDAO.class
 com\ahp\content\dao\MatrixAlternatifDAOImpl.class
 com\ahp\helper\FormHelper.class
+com\ahp\template\HeaderPanel$1.class
 com\ahp\content\model\MatrixAlternatifPrint.class
 com\ahp\content\dao\KriteriaDAO.class
 com\ahp\helper\FormHelper$1.class
@@ -50,13 +52,14 @@ com\ahp\content\dao\HasilAlternatifDAO.class
 com\ahp\content\PenilaianPanel.class
 com\ahp\content\model\HasilAlternatif.class
 com\ahp\content\DashboardPanel$2.class
+com\ahp\content\DashboardPanel$5.class
 com\ahp\content\LaporanPanel.class
 com\ahp\helper\BuatTable.class
 com\ahp\content\PenilaianPanel$7.class
 com\ahp\helper\BuatTable$1.class
 com\ahp\helper\UIComponent$1.class
 com\ahp\template\SidebarPanel.class
-com\ahp\content\DashboardPanel$3$1.class
+com\ahp\template\SidebarPanel$MenuListener.class
 com\ahp\content\PenilaianPanel$2.class
 com\ahp\content\LaporanPanel$1.class
 com\ahp\helper\BuatTable$3.class
@@ -65,6 +68,7 @@ com\ahp\MainFrame.class
 com\ahp\content\PenilaianPanel$5.class
 com\ahp\content\DashboardPanel.class
 com\ahp\content\KaryawanPanel$1.class
+com\ahp\template\SidebarPanel$ModernScrollBarUI.class
 com\ahp\content\PenilaianPanel$1.class
 com\ahp\content\MatrixPanel.class
 com\ahp\util\DBConnection.class

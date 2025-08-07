@@ -4,55 +4,108 @@ import com.ahp.helper.UIComponent;
 import com.ahp.helper.btnModern;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class HeaderPanel extends JPanel {
-
     private final JLabel labelJudul;
     private final JPanel panelKanan;
+    private final JPanel panelKiri;
+    //private final btnModern btnLogout;
 
     public HeaderPanel() {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(0, 60));
-        setBorder(new EmptyBorder(8, 20, 8, 20));
-        setBackground(new Color(45, 120, 210)); 
+        setPreferredSize(new Dimension(0, 70));
+        setBackground(UIComponent.PRIMARY_COLOR);
+        setBorder(BorderFactory.createCompoundBorder(
+            new MatteBorder(0, 0, 2, 0, new Color(0, 0, 0, 20)),
+            new EmptyBorder(0, 25, 0, 25)
+        ));
 
-        labelJudul = UIComponent.buatLabel("Sistem Penilaian Karyawan Berprestasi PT. Hapesindo Omega Penta");
-        labelJudul.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        panelKiri = createTransparentPanel(FlowLayout.LEFT);
+        add(panelKiri, BorderLayout.WEST);
+
+        // Tengah (judul)
+        labelJudul = new JLabel("SISTEM PENILAIAN KARYAWAN PT. HAPESINDO OMEGA PENTA");
+        labelJudul.setFont(UIComponent.FONT_LARGE);
         labelJudul.setForeground(Color.WHITE);
-        labelJudul.setHorizontalAlignment(SwingConstants.LEFT);
-        labelJudul.setOpaque(false);
+        labelJudul.setBorder(new EmptyBorder(0, 10, 0, 0));
         add(labelJudul, BorderLayout.CENTER);
 
-        panelKanan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        panelKanan.setOpaque(false);
+        // Kanan (tombol)
+        panelKanan = createTransparentPanel(FlowLayout.RIGHT);
         add(panelKanan, BorderLayout.EAST);
-
-        
-        btnModern btnLogout = new btnModern("Logout",new Color(255,0,0));
-        btnLogout.setFocusPainted(false);
-        btnLogout.setForeground(Color.WHITE);
-        btnLogout.setBackground(new Color(220, 53, 69));
-        btnLogout.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
-        btnLogout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        panelKanan.add(btnLogout);
     }
 
-    // Set judul header secara dinamis
+    private JPanel createTransparentPanel(int alignment) {
+        JPanel panel = new JPanel(new FlowLayout(alignment, 10, 0));
+        panel.setOpaque(false);
+        return panel;
+    }
+
+    private void setupButtonHover(btnModern button) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(UIComponent.DANGER_COLOR.brighter());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(UIComponent.DANGER_COLOR);
+            }
+        });
+    }
+
+    // ---- Public utility methods ----
     public void setTitle(String title) {
         labelJudul.setText(title);
     }
 
+    public void setTitleFont(Font font) {
+        labelJudul.setFont(font);
+    }
+
     public void addRightComponent(Component comp) {
-        panelKanan.add(comp);
+        panelKanan.add(comp, panelKanan.getComponentCount() - 1);
         panelKanan.revalidate();
         panelKanan.repaint();
     }
 
+    public void addLeftComponent(Component comp) {
+        panelKiri.add(comp);
+        panelKiri.revalidate();
+        panelKiri.repaint();
+    }
+
     public void clearRightComponents() {
-        panelKanan.removeAll();
+        for (int i = panelKanan.getComponentCount() - 2; i >= 0; i--) {
+            panelKanan.remove(i);
+        }
         panelKanan.revalidate();
         panelKanan.repaint();
+    }
+
+    public void clearLeftComponents() {
+        panelKiri.removeAll();
+        panelKiri.revalidate();
+        panelKiri.repaint();
+    }
+
+    public void setLogo(Icon icon) {
+        for (Component comp : panelKiri.getComponents()) {
+            if (comp instanceof JLabel label) {
+                label.setIcon(icon);
+                return;
+            }
+        }
+
+        // Jika belum ada JLabel untuk logo, tambahkan baru
+        JLabel logoLabel = new JLabel(icon);
+        logoLabel.setBorder(new EmptyBorder(0, 0, 0, 15));
+        panelKiri.add(logoLabel, 0);
+        panelKiri.revalidate();
+        panelKiri.repaint();
     }
 }

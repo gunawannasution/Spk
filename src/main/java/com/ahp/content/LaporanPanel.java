@@ -71,8 +71,8 @@ public class LaporanPanel extends JPanel {
         // Row 1
         gbc.gridy = 1;
         gbc.gridx = 0;
-        contentPanel.add(createModernButton("Cetak Matriks Alternatif", "/icons/print.png", 
-            "Cetak laporan matriks alternatif", () -> {
+        contentPanel.add(createModernButton("Cetak Nilai Karyawan", "/icons/print.png", 
+            "Cetak Nilai Karyawan Berdasarkan Kriteria", () -> {
                 if (penilaianPanel != null) penilaianPanel.printReport();
                 else showError("PenilaianPanel belum tersedia!");
             }), gbc);
@@ -84,12 +84,12 @@ public class LaporanPanel extends JPanel {
         // Row 2
         gbc.gridy = 2;
         gbc.gridx = 0;
-        contentPanel.add(createModernButton("Cetak Matrix Perbandingan", "/icons/print.png", 
-            "Cetak matriks perbandingan alternatif", () -> matrixPanel.printReport()), gbc);
+        contentPanel.add(createModernButton("Cetak Bobot Perbandingan", "/icons/print.png", 
+            "Cetak Bobot perbandingan Kriteria", () -> matrixPanel.printReport()), gbc);
 
         gbc.gridx = 1;
         contentPanel.add(createModernButton("Cetak Kriteria", "/icons/print.png", 
-            "Cetak daftar kriteria penilaian", () -> kriteriaPanel.printReport()), gbc);
+            "Cetak Kriteria dan Bobot", () -> kriteriaPanel.printReport()), gbc);
         
         // Row 3 - Centered single button
         gbc.gridy = 3;
