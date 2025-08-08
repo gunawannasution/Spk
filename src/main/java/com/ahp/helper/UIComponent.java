@@ -91,28 +91,19 @@ public class UIComponent {
         return field;
     }
 
-    // ComboBox modern dengan icon optional
-    /**
-     * Untuk data String[] sederhana
-     */
     public static JComboBox<String> buatCmb(String[] items, Icon icon) {
         JComboBox<String> comboBox = new JComboBox<>(items);
         setupComboBox(comboBox, icon);
         return comboBox;
     }
 
-    /**
-     * Untuk model custom dari database (generik)
-     */
     public static <T> JComboBox<T> buatCmbDatabase(ComboBoxModel<T> model, Icon icon) {
         JComboBox<T> comboBox = new JComboBox<>(model);
         setupComboBox(comboBox, icon);
         return comboBox;
     }
 
-    /**
-     * Konfigurasi dasar untuk semua JComboBox
-     */
+
     private static <T> void setupComboBox(JComboBox<T> comboBox, Icon icon) {
         comboBox.setFont(FONT_REGULAR);
         comboBox.setForeground(TEXT_COLOR);
@@ -134,77 +125,7 @@ public class UIComponent {
             });
         }
     }
-    
 
-    // Checkbox modern
-    public static JCheckBox buatCheckBox(String text) {
-        return buatCheckBox(text, null);
-    }
-
-    public static JCheckBox buatCheckBox(String text, Icon icon) {
-        JCheckBox checkBox = new JCheckBox(text, icon);
-        checkBox.setFont(FONT_REGULAR);
-        checkBox.setForeground(TEXT_COLOR);
-        checkBox.setBackground(BACKGROUND_COLOR);
-        checkBox.setIconTextGap(10);
-        checkBox.setFocusPainted(false);
-        checkBox.setBorderPainted(false);
-        checkBox.setOpaque(false);
-        return checkBox;
-    }
-
-    // Table modern dengan striping warna dan header custom
-    public static JTable buatTable(Object[][] data, Object[] columnNames) {
-        return buatTable(data, columnNames, null);
-    }
-
-    public static JTable buatTable(Object[][] data, Object[] columnNames, Icon defaultIcon) {
-        JTable table = new JTable(data, columnNames) {
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                
-                if (defaultIcon != null && c instanceof JLabel) {
-                    ((JLabel) c).setIcon(defaultIcon);
-                    ((JLabel) c).setIconTextGap(8);
-                }
-
-                // Baris genap ganjil warna soft untuk striping
-                c.setBackground(row % 2 == 0 ? new Color(250, 250, 250) : new Color(240, 240, 240));
-                
-                if (isRowSelected(row)) {
-                    c.setBackground(new Color(0, 120, 215, 100));
-                    c.setForeground(Color.WHITE);
-                } else {
-                    c.setForeground(TEXT_COLOR);
-                }
-                
-                return c;
-            }
-        };
-
-        table.setFont(FONT_REGULAR);
-        table.setRowHeight(32);
-        table.setGridColor(BORDER_COLOR);
-        table.setSelectionBackground(new Color(0, 120, 215, 100));
-        table.setSelectionForeground(Color.WHITE);
-        table.setShowVerticalLines(false);
-        table.setShowHorizontalLines(true);
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setFillsViewportHeight(true);
-
-        // Header table modern
-        JTableHeader header = table.getTableHeader();
-        header.setFont(FONT_BOLD);
-        header.setBackground(PRIMARY_COLOR);
-        header.setForeground(Color.WHITE);
-        header.setPreferredSize(new Dimension(header.getWidth(), 36));
-        header.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-        return table;
-    }
-
-    // Border modern untuk field dan combobox
     static Border createModernBorder(int leftPadding) {
         return BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
@@ -212,52 +133,4 @@ public class UIComponent {
         );
     }
 
-    // Tombol modern untuk FlatLaf Light
-    public static JButton createModernButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(FONT_BOLD);
-        button.setForeground(Color.WHITE);
-        button.setBackground(PRIMARY_COLOR);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setContentAreaFilled(true); // biar FlatLaf styling jalan dengan baik
-        return button;
-    }
-    public class FormBuilder extends JPanel {
-    private final GridBagConstraints gbc;
-    private int row = 0;
-
-    public FormBuilder() {
-        setLayout(new GridBagLayout());
-        setBackground(UIComponent.CARD_COLOR); // opsional jika pakai tema
-        gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 10, 8, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1;
-    }
-
-    public void addField(String labelText, JComponent inputComponent) {
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        gbc.gridwidth = 1;
-        this.add(new JLabel(labelText + ":"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = row;
-        gbc.gridwidth = 2;
-        this.add(inputComponent, gbc);
-
-        row++;
-    }
-
-    public void addFullRow(JComponent component) {
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        gbc.gridwidth = 3;
-        this.add(component, gbc);
-        row++;
-    }
-}
 }

@@ -3,11 +3,11 @@ package com.ahp.content;
 import com.ahp.content.dao.KaryawanDAO;
 import com.ahp.content.dao.KaryawanDAOImpl;
 import com.ahp.content.model.Karyawan;
-import com.ahp.helper.BuatTable;
 import com.ahp.helper.ReportUtil;
 import com.ahp.helper.UIComponent;
 import com.ahp.helper.SearchBox;
 import com.ahp.helper.btnModern;
+import com.ahp.helper.customTable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,7 +18,7 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 public class KaryawanPanel extends JPanel {
 
     private final btnModern btnTambah, btnCetak, btnHapus;
-    private BuatTable<Karyawan> tablePanel;
+    private customTable<Karyawan> tablePanel;
     private final KaryawanDAO dao = new KaryawanDAOImpl();
 
     public KaryawanPanel() {
@@ -32,16 +32,13 @@ public class KaryawanPanel extends JPanel {
 
         btnTambah = new btnModern("Tambah", UIComponent.ADD_COLOR,new ImageIcon(getClass().getResource("/icons/add.png")));
         btnTambah.addActionListener(e -> inputData(null));
-        setupButtonAlignment(btnTambah);
 
         btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,new ImageIcon(getClass().getResource("/icons/delete.png")));
         btnHapus.setEnabled(false);
         btnHapus.addActionListener(e -> hapusDataTerpilih());
-        setupButtonAlignment(btnHapus);
 
         btnCetak= new btnModern("Cetak", UIComponent.CETAK_COLOR,new ImageIcon(getClass().getResource("/icons/print.png")));
         btnCetak.addActionListener(e -> printReport());
-        setupButtonAlignment(btnTambah);
 
         SearchBox search = new SearchBox("Cari data...", this::filterPencarian);
         Dimension searchDim = new Dimension(250, 36);
@@ -68,20 +65,12 @@ public class KaryawanPanel extends JPanel {
         add(panelHeader, BorderLayout.NORTH);
         tableKaryawan();
         add(tablePanel, BorderLayout.CENTER);
-
-//        addMouseListener(new java.awt.event.MouseAdapter() {
-//            @Override
-//            public void mouseClicked(java.awt.event.MouseEvent e) {
-//                resetBtnTambah();
-//                btnHapus.setEnabled(false);
-//            }
-//        });
     }
-    private void setupButtonAlignment(AbstractButton btn) {
-        btn.setHorizontalAlignment(SwingConstants.LEFT);
-        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btn.setIconTextGap(6);
-    }
+//    private void setupButtonAlignment(AbstractButton btn) {
+//        btn.setHorizontalAlignment(SwingConstants.LEFT);
+//        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
+//        btn.setIconTextGap(6);
+//    }
     private void inputData(Karyawan k) {
         boolean isEdit = (k != null);
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
@@ -195,7 +184,7 @@ public class KaryawanPanel extends JPanel {
         String[] cols = {"ID", "NIK", "Nama", "Jabatan", "Alamat"};
         List<Karyawan> list = dao.getAll();
 
-        tablePanel = new BuatTable<>(cols, list, k -> new Object[]{
+        tablePanel = new customTable<>(cols, list, k -> new Object[]{
                 k.getId(), k.getNik(), k.getNama(), k.getJabatan(), k.getAlamat()
         });
 
@@ -250,7 +239,7 @@ public class KaryawanPanel extends JPanel {
     private void hapusDataTerpilih() {
         int selectedRow = tablePanel.getTable().getSelectedRow();
         if (selectedRow == -1) {
-            showInfo("Pilih data yang ingin dihapus terlebih dahulu.");
+            pesanError.showInfo(this,"Pilih data yang ingin dihapus terlebih dahulu.");
             return;
         }
 
@@ -266,12 +255,12 @@ public class KaryawanPanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             boolean deleted = dao.delete(k.getId());
             if (deleted) {
-                showInfo("Data berhasil dihapus.");
+                pesanError.showInfo(this,"Data berhasil dihapus.");
                 refreshTabel();
                 resetBtnTambah();
                 //btnHapus.setEnabled(false);
             } else {
-                showError("Gagal menghapus data.", "Error");
+                pesanError.showError(this,"Gagal menghapus data");
             }
         }
     }
@@ -279,7 +268,7 @@ public class KaryawanPanel extends JPanel {
         try {
             List<Karyawan> list = dao.getAll();
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                pesanError.showInfo(this,"Tidak ada data karyawan untuk dicetak.");
                 return;
             }
 
@@ -291,15 +280,10 @@ public class KaryawanPanel extends JPanel {
                     "Jakarta",
                     "GUNAWAN"
             );
-            showInfo("Laporan berhasil dibuat.");
+            pesanError.showInfo(this,"Laporan berhasil dibuat.");
         } catch (Exception e) {
-            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+            pesanError.showError(this,"Gagal mencetak laporan:\n" + e.getMessage());
         }
     }
-    private void showInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-    }
-    private void showError(String msg, String title) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
-    }
+    
 }

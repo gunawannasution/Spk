@@ -3,22 +3,24 @@ package com.ahp.content;
 import com.ahp.content.dao.KriteriaDAO;
 import com.ahp.content.dao.KriteriaDAOImpl;
 import com.ahp.content.model.Kriteria;
-import com.ahp.helper.BuatTable;
 import com.ahp.helper.ReportUtil;
 import com.ahp.helper.UIComponent;
 import com.ahp.helper.btnModern;
 import com.ahp.helper.SearchBox;
+import com.ahp.helper.customTable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.List;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import org.jdesktop.swingx.prompt.PromptSupport;
 
 public class KriteriaPanel extends JPanel {
 
     private final btnModern btnTambah, btnCetak, btnHapus;
-    private BuatTable<Kriteria> tablePanel;
+    private customTable<Kriteria> tablePanel;
     private final KriteriaDAO dao = new KriteriaDAOImpl();
 
     public KriteriaPanel() {
@@ -29,21 +31,16 @@ public class KriteriaPanel extends JPanel {
         lblJudul.setForeground(new Color(33, 33, 33));
         lblJudul.setBorder(new EmptyBorder(10, 15, 5, 15));
 
-        btnTambah = new btnModern("Tambah", UIComponent.ADD_COLOR,
-                new ImageIcon(getClass().getResource("/icons/add.png")));
+        btnTambah = new btnModern("Tambah", UIComponent.ADD_COLOR,new ImageIcon(getClass().getResource("/icons/add.png")));
         btnTambah.addActionListener(e -> inputData(null));
-        setupButtonAlignment(btnTambah);
 
-        btnCetak = new btnModern("Cetak", UIComponent.CETAK_COLOR,
-                new ImageIcon(getClass().getResource("/icons/print.png")));
+        btnCetak = new btnModern("Cetak", UIComponent.CETAK_COLOR,new ImageIcon(getClass().getResource("/icons/print.png")));
         btnCetak.addActionListener(e -> printReport());
-        setupButtonAlignment(btnCetak);
 
-        btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,
-                new ImageIcon(getClass().getResource("/icons/delete.png")));
+        btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,new ImageIcon(getClass().getResource("/icons/delete.png")));
         btnHapus.setEnabled(false);
         btnHapus.addActionListener(e -> hapusDataTerpilih());
-        setupButtonAlignment(btnHapus);
+//        setupButtonAlignment(btnHapus);
 
         SearchBox search = new SearchBox("Cari data...", this::filterPencarian);
         search.setMaximumSize(new Dimension(250, 36));
@@ -70,14 +67,21 @@ public class KriteriaPanel extends JPanel {
         add(panelAtasGabungan, BorderLayout.NORTH);
 
         tableKriteria();
+        initListener();
     }
-
-    private void setupButtonAlignment(AbstractButton btn) {
-        btn.setHorizontalAlignment(SwingConstants.LEFT);
-        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btn.setIconTextGap(6);
-    }
-
+    private void initListener() {
+        this.addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                refreshTabel();
+            }
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });        
+    } 
+    
     private void inputData(Kriteria k) {
         boolean isEdit = (k != null);
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
@@ -198,7 +202,7 @@ public class KriteriaPanel extends JPanel {
         String[] cols = {"ID", "KODE", "NAMA KRITERIA", "KETERANGAN", "BOBOT"};
         List<Kriteria> list = dao.getAll();
 
-        tablePanel = new BuatTable<>(
+        tablePanel = new customTable<>(
                 cols,
                 list,
                 k -> new Object[]{k.getId(), k.getKode(), k.getNama(), k.getKet(), String.format("%.4f", k.getBobot())}
@@ -206,6 +210,10 @@ public class KriteriaPanel extends JPanel {
 
         JTable table = tablePanel.getTable();
 
+        // ✅ Terapkan custom styling dari helper
+        com.ahp.helper.designTable.buatTable(table);
+
+        // ✅ Tambahkan mouse listener seperti biasa
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -219,7 +227,7 @@ public class KriteriaPanel extends JPanel {
             }
         });
 
-        // Enable tombol Hapus saat baris dipilih
+        // ✅ Enable tombol hapus saat baris dipilih
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 btnHapus.setEnabled(table.getSelectedRow() != -1);
@@ -228,6 +236,7 @@ public class KriteriaPanel extends JPanel {
 
         add(tablePanel, BorderLayout.CENTER);
     }
+
 
     private void refreshTabel() {
         List<Kriteria> list = dao.getAll();
@@ -252,7 +261,7 @@ public class KriteriaPanel extends JPanel {
     private void hapusDataTerpilih() {
         int viewRow = tablePanel.getTable().getSelectedRow();
         if (viewRow == -1) {
-            showInfo("Pilih data yang ingin dihapus terlebih dahulu.");
+            pesanError.showInfo(this,"Pilih data yang ingin dihapus terlebih dahulu.");
             return;
         }
 
@@ -269,12 +278,12 @@ public class KriteriaPanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             boolean deleted = dao.delete(k.getId());
             if (deleted) {
-                showInfo("Data berhasil dihapus.");
+                pesanError.showInfo(this,"Data berhasil dihapus.");
                 refreshTabel();
                 btnHapus.setEnabled(false);
                 btnTambah.setText("Tambah");
             } else {
-                showError("Gagal menghapus data.", "Error");
+                pesanError.showError(this,"Gagal menghapus data");
             }
         }
     }
@@ -283,7 +292,7 @@ public class KriteriaPanel extends JPanel {
         try {
             List<Kriteria> list = dao.getAll();
             if (list.isEmpty()) {
-                showInfo("Tidak ada data kriteria untuk dicetak.");
+                pesanError.showInfo(this,"Tidak ada data kriteria untuk dicetak.");
                 return;
             }
 
@@ -295,17 +304,9 @@ public class KriteriaPanel extends JPanel {
                     "Jakarta",
                     "GUNAWAN"
             );
-            showInfo("Laporan berhasil dibuat.");
+            pesanError.showInfo(this,"Laporan berhasil dibuat.");
         } catch (Exception e) {
-            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+            pesanError.showCustomError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
         }
-    }
-
-    private void showInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void showError(String msg, String title) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -74,7 +74,7 @@ public class LaporanPanel extends JPanel {
         contentPanel.add(createModernButton("Cetak Nilai Karyawan", "/icons/print.png", 
             "Cetak Nilai Karyawan Berdasarkan Kriteria", () -> {
                 if (penilaianPanel != null) penilaianPanel.printReport();
-                else showError("PenilaianPanel belum tersedia!");
+                else pesanError.showError(this,"PenilaianPanel belum tersedia!");
             }), gbc);
 
         gbc.gridx = 1;
@@ -143,7 +143,7 @@ public class LaporanPanel extends JPanel {
             try {
                 action.run();
             } catch (Exception ex) {
-                showError("Gagal mencetak: " + ex.getMessage());
+                pesanError.showCustomError("Gagal mencetak: " + ex.getMessage(),"Error");
             }
         });
 
@@ -170,9 +170,5 @@ public class LaporanPanel extends JPanel {
         });
         
         return button;
-    }
-    
-    private void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

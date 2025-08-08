@@ -462,7 +462,7 @@ public class MatrixPanel extends JPanel {
         try {
             List<Matrix> list = dao.getAll();
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                pesanError.showInfo(this,"Tidak ada data karyawan untuk dicetak.");
                 return;
             }
 
@@ -474,16 +474,11 @@ public class MatrixPanel extends JPanel {
                 "Jakarta",
                 "GUNAWAN"
             );
-            showInfo("Laporan berhasil dibuat.");
+            pesanError.showInfo(this,"Laporan berhasil dibuat.");
         } catch (Exception e) {
-            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+            pesanError.showCustomError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
         }
     }
-    private void showInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-    }
-    private void showError(String msg, String title) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
-    }
+
         
 }
