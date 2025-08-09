@@ -66,11 +66,6 @@ public class KaryawanPanel extends JPanel {
         tableKaryawan();
         add(tablePanel, BorderLayout.CENTER);
     }
-//    private void setupButtonAlignment(AbstractButton btn) {
-//        btn.setHorizontalAlignment(SwingConstants.LEFT);
-//        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
-//        btn.setIconTextGap(6);
-//    }
     private void inputData(Karyawan k) {
         boolean isEdit = (k != null);
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
@@ -80,7 +75,7 @@ public class KaryawanPanel extends JPanel {
         JTextField txtNik = UIComponent.buatTxt(20);
         JTextField txtNama = UIComponent.buatTxt(20);
         JComboBox<String> cmbJabatan = UIComponent.buatCmb(
-                new String[]{"Manager Keuangan", "Manager Teknik", "Staf", "Karyawan"},
+                new String[]{"Tenaga Ahli","Petugas K3", "Manager Teknik", "Staf", "Karyawan"},
                 null
         );
         JTextField txtAlamat = UIComponent.buatTxt(20);

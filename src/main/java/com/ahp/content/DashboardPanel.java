@@ -71,8 +71,7 @@ public class DashboardPanel extends JPanel {
         
         contentPanel.add(bottomPanel, BorderLayout.CENTER);
         add(contentPanel, BorderLayout.CENTER);
-    }
-
+    }    
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UIComponent.BACKGROUND_COLOR);
@@ -357,7 +356,7 @@ public class DashboardPanel extends JPanel {
         worker.execute();
     }
 
-        public List<String> getActivityLog() throws SQLException {
+    public List<String> getActivityLog() throws SQLException {
         List<String> logList = new ArrayList<>();
 
         String sql = "SELECT aktivitas FROM log_aktivitas ORDER BY waktu DESC";
@@ -374,8 +373,6 @@ public class DashboardPanel extends JPanel {
 
         return logList;
     }
-
-
 
     private void loadTopHasilData() {
         SwingWorker<List<HasilAlternatif>, Void> worker = new SwingWorker<>() {
