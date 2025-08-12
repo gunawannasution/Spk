@@ -108,29 +108,44 @@ public class ReportUtil {
     }
 
     private static void addFooter(Document document, String kota, String namaDirektur) throws DocumentException {
-        String tanggal = new SimpleDateFormat("dd MMMM yyyy").format(new Date());
+        String tanggal = new SimpleDateFormat("EEEE, dd MMMM yyyy").format(new Date());
 
-        Paragraph tempatTanggal = new Paragraph(kota + ", " + tanggal,
-                new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL));
-        tempatTanggal.setAlignment(Element.ALIGN_RIGHT);
-        tempatTanggal.setSpacingBefore(30);
-        document.add(tempatTanggal);
+        Font normalFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL);
+        Font boldFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 
-        Paragraph jabatan = new Paragraph("Direktur",
-                new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL));
-        jabatan.setAlignment(Element.ALIGN_RIGHT);
-        jabatan.setSpacingBefore(5);
-        document.add(jabatan);
+        // Buat tabel 1 kolom, posisinya di kanan
+        PdfPTable footerTable = new PdfPTable(1);
+        footerTable.setWidthPercentage(40); // lebar blok tanda tangan (40% halaman)
+        footerTable.setHorizontalAlignment(Element.ALIGN_RIGHT); // posisikan ke kanan halaman
+        footerTable.setSpacingBefore(40f); // jarak ke bawah dari elemen sebelumnya (2 spasi double kira-kira)
 
-        document.add(Chunk.NEWLINE);
-        document.add(Chunk.NEWLINE);
-        document.add(Chunk.NEWLINE);
+        // Kota + tanggal (tengah di blok)
+        PdfPCell cell1 = new PdfPCell(new Phrase(kota + ", " + tanggal, normalFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        footerTable.addCell(cell1);
 
-        Paragraph nama = new Paragraph(namaDirektur,
-                new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD));
-        nama.setAlignment(Element.ALIGN_RIGHT);
-        document.add(nama);
+        // Jabatan (tengah di blok)
+        PdfPCell cell2 = new PdfPCell(new Phrase("Direktur", normalFont));
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        footerTable.addCell(cell2);
+
+        // Spasi untuk tanda tangan
+        PdfPCell space = new PdfPCell(new Phrase("\n\n\n", normalFont));
+        space.setBorder(Rectangle.NO_BORDER);
+        footerTable.addCell(space);
+
+        // Nama direktur (tengah di blok)
+        PdfPCell cell4 = new PdfPCell(new Phrase(namaDirektur, boldFont));
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+        footerTable.addCell(cell4);
+
+        document.add(footerTable);
     }
+
+
 
     private static byte[] readImageBytes(URL imageUrl) throws Exception {
         try (InputStream is = imageUrl.openStream();
@@ -162,8 +177,7 @@ public class ReportUtil {
             } else {
                 System.err.println("Desktop tidak didukung di sistem ini.");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
             System.err.println("Gagal membuka file PDF: " + e.getMessage());
         }
     }
