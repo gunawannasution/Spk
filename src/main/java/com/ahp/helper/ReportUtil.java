@@ -3,10 +3,13 @@ package com.ahp.helper;
 import com.ahp.content.dao.PdfExportable;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import java.awt.Desktop;
 
+import java.awt.Desktop;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,65 +26,70 @@ public class ReportUtil {
             String namaDirektur
     ) throws Exception {
 
-        // Siapkan folder laporan
         File reportsDir = new File("reports");
         if (!reportsDir.exists()) {
             reportsDir.mkdirs();
         }
 
-        // Penamaan file otomatis
-        String tanggal = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date());
-        String outputFilePath = "reports/" + baseFileName.replaceAll("\\s+", "_").toLowerCase() + "_" + tanggal + ".pdf";
+        // Nama file unik setiap generate
+        String tanggal = new SimpleDateFormat("EEEE_dd_MMMM_yyyy_HHmmss", new Locale("id", "ID"))
+                .format(new Date());
+        String safeFileName = baseFileName.replaceAll("\\s+", "_").toLowerCase();
+        String outputFilePath = "reports/" + safeFileName + "_" + tanggal + ".pdf";
 
-        Document document = new Document(PageSize.A4);
-        PdfWriter.getInstance(document, new FileOutputStream(outputFilePath));
-        document.open();
+        // agar stream selalu tertutup ketika file di print
+        try (FileOutputStream fos = new FileOutputStream(outputFilePath)) {
+            Document document = new Document(PageSize.A4);
+            PdfWriter.getInstance(document, fos);
+            document.open();
 
-        addKopSurat(document);
+            addKopSurat(document);
 
-        Paragraph title = new Paragraph(reportTitle,
-                new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingBefore(20);
-        title.setSpacingAfter(20);
-        document.add(title);
+            Paragraph title = new Paragraph(reportTitle,
+                    new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD));
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingBefore(20);
+            title.setSpacingAfter(20);
+            document.add(title);
 
-        PdfPTable table = new PdfPTable(headers.length);
-        table.setWidthPercentage(100);
-
-        float[] columnWidths = new float[headers.length];
-        for (int i = 0; i < headers.length; i++) {
-            columnWidths[i] = 1f;
-        }
-        table.setWidths(columnWidths);
-
-        addTableHeader(table, headers);
-
-        int no = 1;
-        for (T item : dataList) {
-            List<String> row = item.toPdfRow();
-
-            // Tambahkan nomor urut jika kolom "No" digunakan
+            // Tabel data
+            PdfPTable table = new PdfPTable(headers.length);
+            table.setWidthPercentage(100);
+            float[] columnWidths = new float[headers.length];
             for (int i = 0; i < headers.length; i++) {
-                String value;
-                if (i == 0 && headers[0].equalsIgnoreCase("No")) {
-                    value = String.valueOf(no++);
-                } else {
-                    value = row.get(i - (headers[0].equalsIgnoreCase("No") ? 1 : 0));
-                }
-                PdfPCell cell = new PdfPCell(new Phrase(value));
-                cell.setPadding(5);
-                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                table.addCell(cell);
+                columnWidths[i] = 1f;
             }
+            table.setWidths(columnWidths);
+
+            addTableHeader(table, headers);
+
+            int no = 1;
+            for (T item : dataList) {
+                List<String> row = item.toPdfRow();
+                for (int i = 0; i < headers.length; i++) {
+                    String value;
+                    if (i == 0 && headers[0].equalsIgnoreCase("No")) {
+                        value = String.valueOf(no++);
+                    } else {
+                        value = row.get(i - (headers[0].equalsIgnoreCase("No") ? 1 : 0));
+                    }
+                    PdfPCell cell = new PdfPCell(new Phrase(value));
+                    cell.setPadding(5);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    table.addCell(cell);
+                }
+            }
+
+            document.add(table);
+
+            // Footer tanda tangan
+            addFooter(document, kota, namaDirektur);
+
+            document.close();
         }
 
-        document.add(table);
-
-        addFooter(document, kota, namaDirektur);
-        document.close();
-
-        openPdf(outputFilePath);
+        // Buka salinan file agar file asli tidak terkunci
+        openPdfFromCopy(outputFilePath);
     }
 
     private static void addTableHeader(PdfPTable table, String[] headers) {
@@ -109,35 +117,30 @@ public class ReportUtil {
     }
 
     private static void addFooter(Document document, String kota, String namaDirektur) throws DocumentException {
-        String tanggal = new SimpleDateFormat("EEEE dd MMMM yyyy").format(new Date());
+        String tanggal = new SimpleDateFormat("EEEE dd MMMM yyyy", new Locale("id", "ID")).format(new Date());
 
         Font normalFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL);
         Font boldFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 
-        // Buat tabel 1 kolom, posisinya di kanan
         PdfPTable footerTable = new PdfPTable(1);
-        footerTable.setWidthPercentage(40); // lebar blok tanda tangan (40% halaman)
-        footerTable.setHorizontalAlignment(Element.ALIGN_RIGHT); // posisikan ke kanan halaman
-        footerTable.setSpacingBefore(40f); // jarak ke bawah dari elemen sebelumnya (2 spasi double kira-kira)
+        footerTable.setWidthPercentage(40);
+        footerTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        footerTable.setSpacingBefore(40f);
 
-        // Kota + tanggal (tengah di blok)
         PdfPCell cell1 = new PdfPCell(new Phrase(kota + ", " + tanggal, normalFont));
         cell1.setBorder(Rectangle.NO_BORDER);
         cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
         footerTable.addCell(cell1);
 
-        // Jabatan (tengah di blok)
         PdfPCell cell2 = new PdfPCell(new Phrase("Direktur", normalFont));
         cell2.setBorder(Rectangle.NO_BORDER);
         cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
         footerTable.addCell(cell2);
 
-        // Spasi untuk tanda tangan
         PdfPCell space = new PdfPCell(new Phrase("\n\n\n", normalFont));
         space.setBorder(Rectangle.NO_BORDER);
         footerTable.addCell(space);
 
-        // Nama direktur (tengah di blok)
         PdfPCell cell4 = new PdfPCell(new Phrase(namaDirektur, boldFont));
         cell4.setBorder(Rectangle.NO_BORDER);
         cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -158,18 +161,23 @@ public class ReportUtil {
         }
     }
 
-    private static void openPdf(String filePath) {
+    private static void openPdfFromCopy(String filePath) {
         try {
-            File file = new File(filePath);
-            if (!file.exists()) {
+            File originalFile = new File(filePath);
+            if (!originalFile.exists()) {
                 System.err.println("File PDF tidak ditemukan: " + filePath);
                 return;
             }
+
+            // Copy ke folder temp agar file asli tidak terkunci
+            Path tempFile = Files.createTempFile("preview_", ".pdf");
+            Files.copy(originalFile.toPath(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.OPEN)) {
-                    desktop.open(file);
-                    System.out.println("Membuka PDF dengan aplikasi default.");
+                    desktop.open(tempFile.toFile());
+                    System.out.println("Membuka salinan PDF untuk preview.");
                 } else {
                     System.err.println("Action OPEN tidak didukung di Desktop.");
                 }
