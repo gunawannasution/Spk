@@ -25,7 +25,7 @@ public class MatrixPanel extends JPanel {
     private final JTextField[] priorityFields = new JTextField[n];
     private final JTextField ciField = new JTextField();
     private final JTextField crField = new JTextField();
-    private final btnModern btnSimpan;
+    private final btnModern btnSimpan,btnHitung,btnClear, btnCetak;
     private final boolean[][] isUpdating = new boolean[n][n];
     private double[] hasilPrioritas;
 
@@ -61,20 +61,16 @@ public class MatrixPanel extends JPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16); 
         add(scrollPane, BorderLayout.CENTER);
 
-        btnModern btnHitung = new btnModern("Hitung", new Color(255,0,0));
-        btnSimpan = new btnModern("Simpan",new Color(0,128,255));
+        btnSimpan = new btnModern("Simpan",UIComponent.ADD_COLOR,new ImageIcon(getClass().getResource("/icons/simpan.png")));
         btnSimpan.setEnabled(false);
-
-        btnModern btnClear = new btnModern("Clear", new Color(128, 128, 128));
-
-        btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
-        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
-        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
-        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
-        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnCetak.setIconTextGap(6);
-        btnCetak.addActionListener(e->printReport());
+        btnHitung = new btnModern("Hitung",UIComponent.PRIMARY_COLOR,new ImageIcon(getClass().getResource("/icons/hitung.png")));
+        btnClear = new btnModern("Clear", UIComponent.DANGER_COLOR,new ImageIcon(getClass().getResource("/icons/clear.png")));
+        btnCetak=new btnModern("Cetak",UIComponent.CETAK_COLOR,new ImageIcon(getClass().getResource("/icons/print.png")));   
+        
+        btnHitung.addActionListener(e -> hitungAHP());
+        btnSimpan.addActionListener(e -> simpanHasil());
+        btnClear.addActionListener(e -> kosongkanForm());
+        btnCetak.addActionListener(e -> printReport());
         
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnPanel.setBackground(UIComponent.BACKGROUND_COLOR);
@@ -85,10 +81,7 @@ public class MatrixPanel extends JPanel {
         btnPanel.add(btnCetak);
         add(btnPanel, BorderLayout.SOUTH);
 
-        btnHitung.addActionListener(e -> hitungAHP());
-        btnSimpan.addActionListener(e -> simpanHasil());
-        btnClear.addActionListener(e -> kosongkanForm());
-        btnCetak.addActionListener(e -> printReport());
+
         
         tampilkanNormalisasiDariDB();
         isiDiagonal();
@@ -469,7 +462,7 @@ public class MatrixPanel extends JPanel {
         try {
             List<Matrix> list = dao.getAll();
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                pesanError.showInfo(this,"Tidak ada data karyawan untuk dicetak.");
                 return;
             }
 
@@ -479,18 +472,13 @@ public class MatrixPanel extends JPanel {
                 "Data Kriteria Penilaian",
                 "laporan_kriteria",
                 "Jakarta",
-                "GUNAWAN"
+                "Ir. Jannus Simanjuntak"
             );
-            showInfo("Laporan berhasil dibuat.");
+            pesanError.showInfo(this,"Laporan berhasil dibuat.");
         } catch (Exception e) {
-            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+            pesanError.showCustomError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
         }
     }
-    private void showInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-    }
-    private void showError(String msg, String title) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
-    }
+
         
 }

@@ -1,9 +1,11 @@
 package com.ahp.login;
 
+import com.ahp.helper.LogService;
 import com.ahp.util.DBConnection;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -14,6 +16,7 @@ public class FormLogin extends JDialog {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
+    private JButton loginBtn;
     private boolean succeeded = false;
     private String role;
 
@@ -41,6 +44,8 @@ public class FormLogin extends JDialog {
         splitPane.setDividerLocation(320);
         splitPane.setEnabled(false); // non-resizable
         add(splitPane, BorderLayout.CENTER);
+        //tombol login bisa di enter
+        SwingUtilities.getRootPane(loginBtn).setDefaultButton(loginBtn);
     }
 
     private JPanel panelKiri() {
@@ -162,40 +167,31 @@ public class FormLogin extends JDialog {
         passwordField = new JPasswordField();
         formPanel.add(passwordField, gbc);
 
-        // Forgot Password link
-        gbc.gridx = 1;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        JLabel forgot = new JLabel("<html><a href='#'>Forgot Password?</a></html>");
-        forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        formPanel.add(forgot, gbc);
-
-        // Login button
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        JButton loginBtn = new JButton("Login");
+        loginBtn = new JButton("Login");
         loginBtn.setBackground(new Color(0, 123, 255));
         loginBtn.setForeground(Color.WHITE);
         loginBtn.setFocusPainted(false);
         loginBtn.setPreferredSize(new Dimension(200, 35));
-        loginBtn.addActionListener(e -> doLogin());
+        loginBtn.addActionListener(e -> doLogin());   
         formPanel.add(loginBtn, gbc);
 
-        // Create account link
-        gbc.gridy++;
-        JLabel create = new JLabel("<html><a href='#'>Create an account?</a></html>");
-        create.setHorizontalAlignment(SwingConstants.CENTER);
-        create.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        formPanel.add(create, gbc);
-        create.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                Window parent = SwingUtilities.getWindowAncestor(panel);
-                new RegisterUser(parent).setVisible(true);
-            }
-        });
+        // buat link daftar
+//        gbc.gridy++;
+//        JLabel create = new JLabel("<html><a href='#'>Create an account?</a></html>");
+//        create.setHorizontalAlignment(SwingConstants.CENTER);
+//        create.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//        formPanel.add(create, gbc);
+//        create.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                Window parent = SwingUtilities.getWindowAncestor(panel);
+//                new RegisterUser(parent).setVisible(true);
+//            }
+//        });
 
         panel.add(formPanel, BorderLayout.CENTER);
 
@@ -221,7 +217,12 @@ public class FormLogin extends JDialog {
             if (rs.next()) {
                 role = rs.getString("role");
                 succeeded = true;
+
                 JOptionPane.showMessageDialog(this, "Login sukses sebagai " + role.toUpperCase());
+
+                // Logging lengkap
+                LogService.insertLog(username, "Login berhasil", "Sebagai: " + role.toUpperCase());
+
                 dispose();
             } else {
                 succeeded = false;

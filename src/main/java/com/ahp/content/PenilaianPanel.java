@@ -13,10 +13,10 @@ import com.ahp.content.model.Karyawan;
 import com.ahp.content.model.Kriteria;
 import com.ahp.content.model.MatrixAlternatif;
 import com.ahp.content.model.MatrixAlternatifPrint;
-import com.ahp.helper.BuatTable;
 import com.ahp.helper.ReportUtil;
 import com.ahp.helper.UIComponent;
 import com.ahp.helper.btnModern;
+import com.ahp.helper.designTable;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -31,11 +31,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 public class PenilaianPanel extends JPanel {
-    private static final Color PRIMARY_COLOR = new Color(63, 81, 181);
-    private static final Color SECONDARY_COLOR = new Color(233, 30, 99);
-    private static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
-    private static final Color TABLE_HEADER_COLOR = new Color(63, 81, 181);
-    private static final Color TABLE_HEADER_TEXT_COLOR = Color.WHITE;
     
     private final HasilAlternatifDAO hasilDAO = new HasilAlternatifDAOImpl();
     private final MatrixAlternatifDAO matrixDAO = new MatrixAlternatifDAOImpl();
@@ -45,47 +40,45 @@ public class PenilaianPanel extends JPanel {
     private JTable table, tableHasil;
     private DefaultTableModel model, modelHasil;
     private JComboBox<Karyawan> cbAlternatif;
-    private List<JTextField> kriteriaFields = new ArrayList<>();
+    private final List<JTextField> kriteriaFields = new ArrayList<>();
     private List<Kriteria> allKriteria = new ArrayList<>();
-    private JButton btnSimpan, btnHapus, btnHitungSkor;
-
+    private btnModern btnSimpan, btnHapus, btnHitungSkor,btnCetak;
+    
+    //construktor
     public PenilaianPanel() {
         setLayout(new BorderLayout());
-        setBackground(BACKGROUND_COLOR);
+        setBackground(UIComponent.BACKGROUND_COLOR);
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBackground(UIComponent.BACKGROUND_COLOR);
         mainPanel.setBorder(BorderFactory.createCompoundBorder(
                 new MatteBorder(1, 1, 1, 1, new Color(220, 220, 220)),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
 
-        mainPanel.add(panelInput(), BorderLayout.NORTH);
-        mainPanel.add(panelTabel(), BorderLayout.CENTER);
+        mainPanel.add(panelInputNilai(), BorderLayout.NORTH);
+        mainPanel.add(tableNilaiKaryawan(), BorderLayout.CENTER);
         mainPanel.add(panelHasil(), BorderLayout.SOUTH);
         
         add(mainPanel, BorderLayout.CENTER);
-        
-        initListeners();
-        loadData();
+        initListener();
+        loadData();       
     }    
-    private void initListeners() {
+    private void initListener() {
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 refreshIsiCombobox();
+                loadTable();
+                loadHasil();
             }
             @Override
             public void ancestorRemoved(AncestorEvent event) {}
             @Override
             public void ancestorMoved(AncestorEvent event) {}
-        });
-
-        btnSimpan.addActionListener(e -> save());
-        btnHapus.addActionListener(e -> delete());
-        btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
-    }  
-    private JPanel panelInput() {
+        });        
+    } 
+    private JPanel panelInputNilai() {
         allKriteria = kriteriaDAO.getAll();
         int kolom = allKriteria.size();
 
@@ -149,18 +142,15 @@ public class PenilaianPanel extends JPanel {
         }
 
         
-        btnSimpan = new btnModern("Simpan", new Color(0,128,255));
-        btnHapus = new btnModern("Hapus", new Color(255,0,0));
-        btnHitungSkor = new btnModern("Hitung Skor", new Color(76, 175, 80));
+        btnSimpan = new btnModern("Simpan", UIComponent.ADD_COLOR,new ImageIcon(getClass().getResource("/icons/simpan.png")));
+        btnHapus = new btnModern("Hapus", UIComponent.DANGER_COLOR,new ImageIcon(getClass().getResource("/icons/delete.png")));
+        btnHitungSkor = new btnModern("Hitung Skor", UIComponent.PRIMARY_COLOR,new ImageIcon(getClass().getResource("/icons/hitung.png")));
+        btnCetak=new btnModern("Cetak",UIComponent.CETAK_COLOR,new ImageIcon(getClass().getResource("/icons/print.png")));
         
-        btnModern btnCetak=new btnModern("Print",new Color(96, 125, 139));
-        ImageIcon iconPrint = new ImageIcon(getClass().getResource("/icons/print.png"));
-        Image ukuranIconPrint = iconPrint.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        btnCetak.setIcon(new ImageIcon(ukuranIconPrint));
-        btnCetak.setHorizontalAlignment(SwingConstants.LEFT);
-        btnCetak.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnCetak.setIconTextGap(6);
-        btnCetak.addActionListener(e -> printReport());
+        btnSimpan.addActionListener(e -> save());
+        btnHapus.addActionListener(e -> delete());
+        btnHitungSkor.addActionListener(e -> hitungSkorAlternatif());
+        btnCetak.addActionListener(e -> printReport());            
         
         JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         bp.setBackground(Color.WHITE);
@@ -173,12 +163,12 @@ public class PenilaianPanel extends JPanel {
 
         return panel;
     }
-    private JPanel panelTabel() {
+    private JPanel tableNilaiKaryawan() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(UIComponent.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(200, 200, 200)), 
-            "Data Matrix Alternatif",
+            "Penilaian Karyawan Berdasarkan Kriteria",
             TitledBorder.LEFT,
             TitledBorder.TOP,
             new Font("Segoe UI", Font.BOLD, 12),
@@ -195,7 +185,7 @@ public class PenilaianPanel extends JPanel {
         };
 
         table = new JTable(model);
-        customTable(table);
+        designTable.buatTable(table);
         table.getSelectionModel().addListSelectionListener(e -> isiFormDariTable());
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -206,7 +196,7 @@ public class PenilaianPanel extends JPanel {
     }
     private JPanel panelHasil() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(UIComponent.BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(200, 200, 200)), 
             "HASIL PERHITUNGAN SKOR ALTERNATIF",
@@ -270,8 +260,8 @@ public class PenilaianPanel extends JPanel {
 
         // Styling header
         JTableHeader header = tableHasil.getTableHeader();
-        header.setBackground(TABLE_HEADER_COLOR);
-        header.setForeground(TABLE_HEADER_TEXT_COLOR);
+        header.setBackground(UIComponent.TABLE_HEADER_COLOR);
+        header.setForeground(UIComponent.TABLE_HEADER_TEXT_COLOR);
         header.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
         // Set renderer untuk kolom lainnya
@@ -612,52 +602,7 @@ public class PenilaianPanel extends JPanel {
                 return;
             }
         }
-    }  
-    public void customTable(JTable table) {
-        table.setRowHeight(30);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setFillsViewportHeight(true);
-        table.setAutoCreateRowSorter(true);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(5, 5)); // Diperkecil dari 100,100
-        table.setSelectionBackground(new Color(220, 220, 255));
-        table.setSelectionForeground(Color.BLACK);
-
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(63, 81, 181));
-        header.setForeground(Color.WHITE);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(
-                    JTable table, Object value,boolean isSelected, 
-                    boolean hasFocus, int row, int column) 
-            {
-
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                c.setForeground(Color.BLACK); // Pastikan teks berwarna gelap
-                c.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-                // Warna background
-                if (!isSelected) {
-                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 248, 248));
-                }
-
-                // Alignment tengah
-                ((JLabel)c).setHorizontalAlignment(SwingConstants.CENTER);
-
-                return c;
-            }
-        };
-
-        // Terapkan ke semua kolom
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-    }
-    //tampilhasil
+    }    
     private void loadHasil() {
         SwingWorker<List<HasilAlternatif>, Void> worker = new SwingWorker<>() {
             @Override
@@ -684,13 +629,12 @@ public class PenilaianPanel extends JPanel {
                         });
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    showError("Gagal memuat data hasil: " + e.getMessage(), "Error");
+                    pesanError.showCustomError("Gagal memuat data hasil: " + e.getMessage(), "Error");
                 }
             }
         };
         worker.execute();
     }
-
     public void printReport() {
         List<Kriteria> listKriteria = kriteriaDAO.getAll();
         List<Karyawan> listAlternatif = alternatifDAO.getAll();
@@ -732,28 +676,24 @@ public class PenilaianPanel extends JPanel {
     public void printReportHasil() {
         try {
             List<HasilAlternatif> list = hasilDAO.getAll();
+
             if (list.isEmpty()) {
-                showInfo("Tidak ada data karyawan untuk dicetak.");
+                pesanError.showInfo(this,"Tidak ada data hasil alternatif untuk dicetak.");
                 return;
             }
 
             ReportUtil.generatePdfReport(
                 list,
-                new String[]{"No", "NIK", "Nama", "Jabatan", "Alamat"},
-                "Laporan Data Karyawan",
-                "laporan_karyawan",
+                new String[]{"Peringkat", "Nama", "Skor", "Rekomendasi"},
+                "Laporan Hasil Penilaian",
+                "laporan_hasil_alternatif",
                 "Jakarta",
-                "GUNAWAN"
+                "Ir. Jannus Simanjuntak"
             );
-            showInfo("Laporan berhasil dibuat.");
+
+            pesanError.showInfo(this,"Laporan berhasil dibuat.");
         } catch (Exception e) {
-            showError("Gagal mencetak laporan:\n" + e.getMessage(), "Gagal Cetak");
+            pesanError.showError(this,"Gagal mencetak laporan:\n" + e.getMessage());
         }
-    }
-    private void showInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Informasi", JOptionPane.INFORMATION_MESSAGE);
-    }
-    private void showError(String msg, String title) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -1,80 +1,85 @@
 package com.ahp.template;
 
-import com.ahp.content.DashboardPanel;
-import com.ahp.content.KaryawanPanel;
-import com.ahp.content.KriteriaPanel;
-import com.ahp.content.LaporanPanel;
-import com.ahp.content.MatrixPanel;
-import com.ahp.content.PenilaianPanel;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import javax.swing.JPanel;
+import com.ahp.content.*;
 import com.formdev.flatlaf.FlatClientProperties;
+import javax.swing.*;
+import java.awt.*;
 
 public class ContentPanel extends JPanel {
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cardPanel = new JPanel(cardLayout);
+    private String currentPanelName = "dashboard"; // Track current panel name
     
-    // Simpan referensi MatrixPanel agar tidak null saat dipanggil
-    private MatrixPanel matrixPanel;
-    private PenilaianPanel penilaianPanel = new PenilaianPanel();
-    private final KaryawanPanel karyawanPanel=new KaryawanPanel();
-    private KriteriaPanel kriteriaPanel=new KriteriaPanel();
-    
+    // Panel instances
+    private final DashboardPanel dashboardPanel;
+    private final KaryawanPanel karyawanPanel;
+    private final KriteriaPanel kriteriaPanel;
+    private final MatrixPanel matrixPanel;
+    private final PenilaianPanel penilaianPanel;
+    private final LaporanPanel laporanPanel;
+
     public ContentPanel() {
-        setLayout(new BorderLayout());
-        putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
-        
-        cardPanel.putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
-        add(cardPanel, BorderLayout.CENTER);
-        buatPanel();
-    }
-
-    private void buatPanel() {
-        addPanelWithFade(new DashboardPanel(), "dashboard");
-        addPanelWithFade(new KaryawanPanel(), "karyawan");
-        addPanelWithFade(new KriteriaPanel(), "kriteria");
-        
+        // Initialize all panels
+        dashboardPanel = new DashboardPanel();
+        karyawanPanel = new KaryawanPanel();
+        kriteriaPanel = new KriteriaPanel();
         matrixPanel = new MatrixPanel();
-        addPanelWithFade(matrixPanel, "matrix");
-        LaporanPanel laporanPanel = new LaporanPanel(penilaianPanel,karyawanPanel,matrixPanel, kriteriaPanel);
-        addPanelWithFade(laporanPanel, "laporan");
+        penilaianPanel = new PenilaianPanel();
+        laporanPanel = new LaporanPanel(penilaianPanel, karyawanPanel, matrixPanel, kriteriaPanel);
+
+        setLayout(new BorderLayout());
+        applyBackgroundStyle(this);
         
-        addPanelWithFade(new PenilaianPanel(), "penilaian");
+        cardPanel.setOpaque(false);
+        applyBackgroundStyle(cardPanel);
+        add(cardPanel, BorderLayout.CENTER);
+        
+        initializePanels();
     }
 
-    private void addPanelWithFade(JPanel panel, String name) {
-        panel.putClientProperty(FlatClientProperties.STYLE,"background: $Panel.background");
+    private void initializePanels() {
+        addPanel(dashboardPanel, "dashboard");
+        addPanel(karyawanPanel, "karyawan");
+        addPanel(kriteriaPanel, "kriteria");
+        addPanel(matrixPanel, "matrix");
+        addPanel(penilaianPanel, "penilaian");
+        addPanel(laporanPanel, "laporan");
+    }
+
+    private void addPanel(JPanel panel, String name) {
+        applyBackgroundStyle(panel);
         cardPanel.add(panel, name);
+    }
+
+    private void applyBackgroundStyle(JComponent component) {
+        component.putClientProperty(
+            FlatClientProperties.STYLE,
+            "background: $Panel.background"
+        );
     }
 
     public void showPanel(String name) {
         try {
             cardLayout.show(cardPanel, name);
-            cardPanel.revalidate();
-            cardPanel.repaint();
+            currentPanelName = name; // Update current panel name
+            refreshPanel();
         } catch (IllegalArgumentException e) {
             System.err.println("Panel not found: " + name);
+            // Fallback to dashboard
+            cardLayout.show(cardPanel, "dashboard");
+            currentPanelName = "dashboard";
+            refreshPanel();
         }
     }
 
-    public void navigateTo(String panelName) {
-        if (cardPanel.getComponentCount() > 0) {
-            showPanel(panelName);
-        }
+    public String getCurrentPanelName() {
+        return currentPanelName;
     }
 
-    public JPanel getCurrentPanel() {
-        for (java.awt.Component comp : cardPanel.getComponents()) {
-            if (comp.isVisible()) {
-                return (JPanel) comp;
-            }
-        }
-        return null;
+    private void refreshPanel() {
+        cardPanel.revalidate();
+        cardPanel.repaint();
     }
 
-    // Getter matrixPanel yang sudah diinisialisasi
-    public MatrixPanel getMatrixPanel() {
-        return matrixPanel;
-    }
+    // ... (keep all other existing methods) ...
 }

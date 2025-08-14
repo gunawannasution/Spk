@@ -43,7 +43,14 @@ public class HasilAlternatifDAOImpl implements HasilAlternatifDAO {
     @Override
     public List<HasilAlternatif> getAll() {
         List<HasilAlternatif> list = new ArrayList<>();
-        String sql = "SELECT * FROM hasil_alternatif";
+
+        String sql = """
+            SELECT ha.id, ha.id_alternatif, ha.skor, ha.peringkat, ha.rekomendasi,
+                   a.nama AS nama_alternatif
+            FROM hasil_alternatif ha
+            JOIN alternatif a ON ha.id_alternatif = a.id
+            ORDER BY ha.peringkat ASC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -57,15 +64,17 @@ public class HasilAlternatifDAOImpl implements HasilAlternatifDAO {
                     rs.getInt("peringkat"),
                     rs.getString("rekomendasi")
                 );
+                hasil.setNamaAlternatif(rs.getString("nama_alternatif"));
                 list.add(hasil);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
 
         return list;
     }
+
 
     @Override
     public List<HasilAlternatif> getTopHasil(int limit) {
@@ -74,6 +83,7 @@ public class HasilAlternatifDAOImpl implements HasilAlternatifDAO {
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, limit);
             ResultSet rs = ps.executeQuery();
 
@@ -90,6 +100,7 @@ public class HasilAlternatifDAOImpl implements HasilAlternatifDAO {
             e.printStackTrace();
         }
 
-    return list;
+        return list;
     }
+
 }

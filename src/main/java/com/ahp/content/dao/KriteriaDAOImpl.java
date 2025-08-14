@@ -37,7 +37,6 @@ public class KriteriaDAOImpl implements KriteriaDAO {
         }
     }
 
-
     @Override
     public List<Kriteria> getAll() {
         List<Kriteria> list = new ArrayList<>();
@@ -152,7 +151,6 @@ public class KriteriaDAOImpl implements KriteriaDAO {
             return false;
         }
     }
-
   
     @Override
     public boolean updateAllBobot(List<Kriteria> kriteriaList) {
@@ -219,7 +217,6 @@ public class KriteriaDAOImpl implements KriteriaDAO {
         }
     }
 
-    
     @Override
     public int count() {
         String sql = "SELECT COUNT(*) FROM kriteria";

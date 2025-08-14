@@ -6,27 +6,47 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 public class UIComponent {
-    // Warna sesuai FlatLaf Light theme & modern clean look
-    public static final Color BACKGROUND_COLOR    = new Color(250, 250, 250);  // putih bersih
-    public static final Color CARD_COLOR          = new Color(240, 240, 240);  // abu-abu terang
-    public static final Color PRIMARY_COLOR       = new Color(0, 120, 215);    // biru terang khas FlatLaf light
-    public static final Color SECONDARY_COLOR     = new Color(255, 121, 198);  // pink/ungu cerah
-    public static final Color SUCCESS_COLOR       = new Color(76, 175, 80);    // hijau
-    public static final Color WARNING_COLOR       = new Color(255, 193, 7);    // kuning hangat
-    public static final Color DANGER_COLOR        = new Color(220, 53, 69);    // merah soft
-    public static final Color TITLE_COLOR         = new Color(33, 33, 33);     // hitam gelap
-    public static final Color TEXT_COLOR          = new Color(66, 66, 66);     // abu-abu gelap
-    public static final Color BORDER_COLOR        = new Color(200, 200, 200);  // abu-abu muda
-    public static final Color HIGHLIGHT_COLOR     = new Color(230, 230, 230);  // abu-abu sangat muda
-    public static final Color DISABLED_COLOR      = new Color(160, 160, 160);  // abu-abu redup
+    public static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
+    public static final Color CARD_COLOR = new Color(240, 240, 240);
+    public static final Color PRIMARY_COLOR = new Color(0, 120, 215);
+    public static final Color SECONDARY_COLOR = new Color(255, 121, 198);
+    public static final Color SUCCESS_COLOR = new Color(76, 175, 80);
+    public static final Color WARNING_COLOR = new Color(255, 193, 7);
+    public static final Color DANGER_COLOR = new Color(220, 53, 69);
+    public static final Color ACCENT_COLOR = new Color(153, 255, 153);
+    public static final Color ADD_COLOR = new Color(0, 153, 0);
+    public static final Color CETAK_COLOR = new Color(0, 155, 153);
+    public static final Color SIMPAN_COLOR = new Color(0,128,255);
+    public static final Color TITLE_COLOR = new Color(33, 33, 33);
+    public static final Color TEXT_COLOR = new Color(0, 0, 0);
+    public static final Color TEXT_SECONDARY_COLOR = new Color(66, 66, 66);
+    public static final Color BORDER_COLOR = new Color(200, 200, 200);
+    public static final Color HIGHLIGHT_COLOR = new Color(230, 230, 230);
+    public static final Color DISABLED_COLOR = new Color(160, 160, 160);
     public static final Color TABLE_HEADER_COLOR = new Color(63, 81, 181);
     public static final Color TABLE_HEADER_TEXT_COLOR = Color.WHITE;
-    // Font modern
-    public static final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 14);
+
+    // Font Constants (enhanced with proper initialization)
+    public static final Font FONT_PLAIN = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_REGULAR = FONT_PLAIN; // Alias for consistency
     public static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 16);
-    public static Font FONT_SMALL;
+    public static final Font FONT_MEDIUM = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 12);
+    public static final Font FONT_LARGE = new Font("Segoe UI", Font.BOLD, 18);
+    
+    public static final Color COLOR_BG_MENU = new Color(28, 30, 32);
+    public static final Color COLOR_HOVER_MENU = new Color(44, 44, 48);
+    public static final Color COLOR_SELECTED_MENU = new Color(60, 63, 65);
+    public static final Color COLOR_TEXT_MENU = new Color(240, 240, 240);
+    public static  final Color COLOR_SUBTEXT_MENU = new Color(180, 180, 180);
 
+    // Fonts
+    public static final Font FONT_MENU = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_MENU_SELECTED_MENU = new Font("Segoe UI", Font.BOLD, 14);
+    public static final Font FONT_HEADER_MENU = new Font("Segoe UI", Font.BOLD, 18);
+    public static final Font FONT_SUBHEADER_MENU = new Font("Segoe UI", Font.PLAIN, 11);
+    
     // Label dengan style modern
     public static JLabel buatLabel(String text) {
         return buatLabel(text, null);
@@ -71,28 +91,19 @@ public class UIComponent {
         return field;
     }
 
-    // ComboBox modern dengan icon optional
-    /**
-     * Untuk data String[] sederhana
-     */
     public static JComboBox<String> buatCmb(String[] items, Icon icon) {
         JComboBox<String> comboBox = new JComboBox<>(items);
         setupComboBox(comboBox, icon);
         return comboBox;
     }
 
-    /**
-     * Untuk model custom dari database (generik)
-     */
     public static <T> JComboBox<T> buatCmbDatabase(ComboBoxModel<T> model, Icon icon) {
         JComboBox<T> comboBox = new JComboBox<>(model);
         setupComboBox(comboBox, icon);
         return comboBox;
     }
 
-    /**
-     * Konfigurasi dasar untuk semua JComboBox
-     */
+
     private static <T> void setupComboBox(JComboBox<T> comboBox, Icon icon) {
         comboBox.setFont(FONT_REGULAR);
         comboBox.setForeground(TEXT_COLOR);
@@ -114,77 +125,7 @@ public class UIComponent {
             });
         }
     }
-    
 
-    // Checkbox modern
-    public static JCheckBox buatCheckBox(String text) {
-        return buatCheckBox(text, null);
-    }
-
-    public static JCheckBox buatCheckBox(String text, Icon icon) {
-        JCheckBox checkBox = new JCheckBox(text, icon);
-        checkBox.setFont(FONT_REGULAR);
-        checkBox.setForeground(TEXT_COLOR);
-        checkBox.setBackground(BACKGROUND_COLOR);
-        checkBox.setIconTextGap(10);
-        checkBox.setFocusPainted(false);
-        checkBox.setBorderPainted(false);
-        checkBox.setOpaque(false);
-        return checkBox;
-    }
-
-    // Table modern dengan striping warna dan header custom
-    public static JTable buatTable(Object[][] data, Object[] columnNames) {
-        return buatTable(data, columnNames, null);
-    }
-
-    public static JTable buatTable(Object[][] data, Object[] columnNames, Icon defaultIcon) {
-        JTable table = new JTable(data, columnNames) {
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                
-                if (defaultIcon != null && c instanceof JLabel) {
-                    ((JLabel) c).setIcon(defaultIcon);
-                    ((JLabel) c).setIconTextGap(8);
-                }
-
-                // Baris genap ganjil warna soft untuk striping
-                c.setBackground(row % 2 == 0 ? new Color(250, 250, 250) : new Color(240, 240, 240));
-                
-                if (isRowSelected(row)) {
-                    c.setBackground(new Color(0, 120, 215, 100));
-                    c.setForeground(Color.WHITE);
-                } else {
-                    c.setForeground(TEXT_COLOR);
-                }
-                
-                return c;
-            }
-        };
-
-        table.setFont(FONT_REGULAR);
-        table.setRowHeight(32);
-        table.setGridColor(BORDER_COLOR);
-        table.setSelectionBackground(new Color(0, 120, 215, 100));
-        table.setSelectionForeground(Color.WHITE);
-        table.setShowVerticalLines(false);
-        table.setShowHorizontalLines(true);
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setFillsViewportHeight(true);
-
-        // Header table modern
-        JTableHeader header = table.getTableHeader();
-        header.setFont(FONT_BOLD);
-        header.setBackground(PRIMARY_COLOR);
-        header.setForeground(Color.WHITE);
-        header.setPreferredSize(new Dimension(header.getWidth(), 36));
-        header.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-
-        return table;
-    }
-
-    // Border modern untuk field dan combobox
     static Border createModernBorder(int leftPadding) {
         return BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
@@ -192,17 +133,4 @@ public class UIComponent {
         );
     }
 
-    // Tombol modern untuk FlatLaf Light
-    public static JButton createModernButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(FONT_BOLD);
-        button.setForeground(Color.WHITE);
-        button.setBackground(PRIMARY_COLOR);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setContentAreaFilled(true); // biar FlatLaf styling jalan dengan baik
-        return button;
-    }
-    
 }
